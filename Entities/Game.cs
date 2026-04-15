@@ -16,13 +16,14 @@ public class Game
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-
+    //
     public User Owner { get; set; } = null!;
     public ICollection<GameTagMap> GameTagMaps { get; set; } = new List<GameTagMap>(); 
     public ICollection<GamePurchase> GamePurchases { get; set; } = new List<GamePurchase>();
     public ICollection<GameComment> GameComments { get; set; } = new List<GameComment>();
     public ICollection<GameFavorite> GameFavorites { get; set; } = new List<GameFavorite>();
     public ICollection<GameRating> GameRatings { get; set; } = new List<GameRating>();
+    public ICollection<GamePlay> GamePlays { get; set; } = new List<GamePlay>();
 }
 
 public enum GameType

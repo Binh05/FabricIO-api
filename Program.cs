@@ -1,8 +1,13 @@
 using System.Reflection;
+using System.Text;
 using FabricIO_api.DataAccess;
+using FabricIO_api.Entities;
 using FabricIO_api.Services;
 using FabricIO_api.UnitOfWork;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +16,28 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "FabricIO API", Version = "v1" });
+
+    // Định nghĩa scheme "Bearer"
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Nhập JWT token vào ô bên dưới.\nVí dụ: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    });
+
+    // Yêu cầu Bearer token cho các endpoint có [Authorize] (cú pháp Swashbuckle 10.x)
+    c.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    });
+});
 
 builder.Services.AddDbContext<DbContext, AppDbContext>(options =>
 {
@@ -23,6 +49,25 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 builder.Services.AddAutoMapper(config => {}, Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IGameServices, GameServices>();
+builder.Services.AddScoped<IAuthServices, AuthServices>();
+builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
+
+var secretKey = builder.Configuration["AppSettings:SecretKey"];
+var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey!);
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
+{
+    opt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes)
+    };
+});
 
 var app = builder.Build();
 
@@ -36,6 +81,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

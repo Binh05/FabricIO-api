@@ -4,6 +4,7 @@ namespace FabricIO_api.DTOs;
 
 public class UserDto
 {
+    public Guid? Id { get; set; }
     [EmailAddress]
     [Required]
     public required string Email { get; set; }

@@ -47,4 +47,10 @@ public class Repository<T>(IMapper mapper, AppDbContext ctx) : IRepository<T> wh
         ctx.Update(entity);
         return entity;
     }
+
+    public IEnumerable<T> InsertRange(IEnumerable<T> entities)
+    {
+        ctx.AddRange(entities);
+        return entities;
+    }
 }

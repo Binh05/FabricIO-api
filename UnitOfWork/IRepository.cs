@@ -10,4 +10,6 @@ public interface IRepository<T>
     T Insert(T entity);
     T Update(T entity);
     Task<T?> DeleteAsync(Guid id, CancellationToken token);
+
+    IEnumerable<T> InsertRange(IEnumerable<T> entities);
 }

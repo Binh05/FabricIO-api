@@ -23,4 +23,13 @@ public class UserService(IUnitOfWork uof, IMapper mapper) : IUserService
 
         return entity;
     }
+
+    public async Task<IEnumerable<User>> InsertRangeAsync(IEnumerable<UserDto> users, CancellationToken token)
+    {
+        var entities = mapper.Map<IEnumerable<User>>(users);
+        uof.Users.InsertRange(entities);
+        await uof.SaveAsync(token);
+
+        return entities;
+    } 
 }

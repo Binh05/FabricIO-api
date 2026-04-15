@@ -32,6 +32,7 @@ public class User
     public ICollection<Block> Blockers { get; set; } = new List<Block>();
     public ICollection<Block> Blockeds { get; set; } = new List<Block>();
     public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public ICollection<GamePlay> GamePlays { get; set; } = new List<GamePlay>(); 
 }
 
 public enum UserRole

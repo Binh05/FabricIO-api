@@ -9,6 +9,7 @@ public class AppDbContext: DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Game> Games { get; set; }
+    public DbSet<GamePlay> GameLogs { get; set; }
     public DbSet<GameTagMap> GameTagMaps { get; set; }
     public DbSet<GameTag> GameTags { get; set; }
     public DbSet<GameComment> GameComments { get; set; }

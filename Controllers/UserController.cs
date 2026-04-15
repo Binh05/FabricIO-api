@@ -27,4 +27,12 @@ public class UserController(IUserService userService) : ControllerBase
 
         return Ok(entities);
     }
+
+    [HttpPost("list")]
+    public async Task<IEnumerable<User>> InsertRangeAsync(IEnumerable<UserDto> users, CancellationToken token)
+    {
+        var entities = await userService.InsertRangeAsync(users, token);
+
+        return entities;
+    }
 }
