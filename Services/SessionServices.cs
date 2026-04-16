@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AutoMapper;
 using FabricIO_api.Entities;
 using FabricIO_api.UnitOfWork;
@@ -35,5 +36,16 @@ public class SessionService(IUnitOfWork unitOfWork) : ISessionServices
         await unitOfWork.SaveAsync(cancellationToken);
 
         return tokenExisting;
+    }
+    public async Task<Session> FindOneAsync(Expression<Func<Session, bool>> predicate, CancellationToken cancellationToken)
+    {
+        var session = await unitOfWork.Sessions.FindOneAsync(predicate, cancellationToken);
+
+        if (session == null || session.IsReVoked || session.ExpiresAt < DateTime.UtcNow)
+        {
+            throw new Exception("Token không hợp lệ hoặc hết hạn");
+        }
+
+        return session;
     }
 }

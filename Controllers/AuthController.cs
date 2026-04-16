@@ -48,14 +48,26 @@ public class AuthController(IAuthServices authServices, ISessionServices session
             return BadRequest("Bạn chưa đăng nhập");
         }
 
+        Response.Cookies.Delete("refreshToken");
+
         await sessionServices.RevokeSessionAsync(refreshToken, cancellationToken);
         return NoContent();
     }
 
-    [HttpGet]
-    public async Task<string> GetToken(Guid userId)
+    [HttpGet("refresh")]
+    public async Task<ActionResult<string>> RefreshTokenAsync(CancellationToken cancellationToken)
     {
-        return authServices.GenerateJwtToken(userId);
+        var refreshToken = Request.Cookies["refreshToken"];
+        if (refreshToken == null)
+        {
+            return Unauthorized();
+        }
+
+        var session = await sessionServices.FindOneAsync(s => s.Token == refreshToken, cancellationToken);
+
+        var token = authServices.GenerateJwtToken(session.UserId);
+
+        return Ok(new { accessToken = token });
     }
     
     [Authorize]
