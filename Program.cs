@@ -51,6 +51,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGameServices, GameServices>();
 builder.Services.AddScoped<IAuthServices, AuthServices>();
+builder.Services.AddScoped<ISessionServices, SessionService>();
 builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
 
 var secretKey = builder.Configuration["AppSettings:SecretKey"];

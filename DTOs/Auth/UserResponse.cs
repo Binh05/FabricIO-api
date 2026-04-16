@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FabricIO_api.DTOs;
 
-public class UserDto
+public class UserResponse
 {
     public Guid? Id { get; set; }
     [EmailAddress]

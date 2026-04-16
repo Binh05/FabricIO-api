@@ -10,26 +10,5 @@ namespace FabricIO_api.Services;
 
 public class UserService(IUnitOfWork uof, IMapper mapper) : IUserService
 {
-    public async Task<IEnumerable<UserDto>> GetAsync(CancellationToken token)
-    {
-        return await uof.Users.GetAllAsync<UserDto>(token);
-    }
-
-    public async Task<User> InsertAsync(UserDto user, CancellationToken token)
-    {
-        var entity = mapper.Map<User>(user);
-        uof.Users.Insert(entity);
-        await uof.SaveAsync(token);
-
-        return entity;
-    }
-
-    public async Task<IEnumerable<User>> InsertRangeAsync(IEnumerable<UserDto> users, CancellationToken token)
-    {
-        var entities = mapper.Map<IEnumerable<User>>(users);
-        uof.Users.InsertRange(entities);
-        await uof.SaveAsync(token);
-
-        return entities;
-    } 
+    
 }
