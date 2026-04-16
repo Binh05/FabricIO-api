@@ -19,6 +19,7 @@ public class User
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     //
+    public ICollection<Session> Sessions { get; set; } = new List<Session>();
     public ICollection<Game> Games { get; set; } = new List<Game>();
     public ICollection<Post> Posts { get; set; } = new List<Post>();
     public ICollection<GamePurchase> GamePurchases { get; set; } = new List<GamePurchase>();

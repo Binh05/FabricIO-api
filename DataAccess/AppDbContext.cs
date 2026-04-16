@@ -22,6 +22,7 @@ public class AppDbContext: DbContext
     public DbSet<Follow> Follows { get; set; }
     public DbSet<Block> Blocks { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<Session> Sessions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
