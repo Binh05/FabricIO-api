@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using Minio;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// DbContext Config
 builder.Services.AddDbContext<DbContext, AppDbContext>(options =>
 {
     var connectionString = Environment.GetEnvironmentVariable("ASPNETCORE_CONNECTION") ?? builder.Configuration.GetConnectionString("DefaultConnection");
@@ -46,12 +48,24 @@ builder.Services.AddDbContext<DbContext, AppDbContext>(options =>
 });
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+//MinIO Config
+var endpoint = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ENDPOINT");
+var accessKey = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ACCESSKEY");
+var secretKeyMinio = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_SECRETKEY");
+
+builder.Services.AddMinio(configureClient => configureClient
+    .WithEndpoint(endpoint)
+    .WithCredentials(accessKey, secretKeyMinio)
+    .WithSSL(false)
+    .Build());
+
 builder.Services.AddAutoMapper(config => {}, Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGameServices, GameServices>();
 builder.Services.AddScoped<IAuthServices, AuthServices>();
 builder.Services.AddScoped<ISessionServices, SessionService>();
+builder.Services.AddScoped<IStorageServices, StorageServices>();
 builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
 
 var secretKey = builder.Configuration["AppSettings:SecretKey"];

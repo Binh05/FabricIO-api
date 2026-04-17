@@ -69,11 +69,4 @@ public class AuthController(IAuthServices authServices, ISessionServices session
 
         return Ok(new { accessToken = token });
     }
-    
-    [Authorize]
-    [HttpGet("id")]
-    public async Task<Guid> GetIdFromTokenAsync()
-    {
-        return User.GetUserId();
-    }
 }
