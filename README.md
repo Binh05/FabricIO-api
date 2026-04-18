@@ -13,3 +13,7 @@ dotnet restore
 ```
 dotnet run
 ```
+
+#### document api
+
+[Document](http://localhost:5000/swagger)
