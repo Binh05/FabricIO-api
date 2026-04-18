@@ -11,7 +11,5 @@ public class UserProfile : Profile
         CreateMap<UserResponse, User>().ReverseMap();
 
         CreateMap<UserRegister, User>().ForMember(dest => dest.HashedPassword, opt => opt.MapFrom(src => src.Password));
-
-        CreateMap<Game, GameDto>().ReverseMap();
     }
 }
