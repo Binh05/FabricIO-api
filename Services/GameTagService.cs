@@ -37,4 +37,9 @@ public class GameTagService(IUnitOfWork unitOfWork, IMapper mapper) : IGameTagSe
 
         return entity;
     }
+
+    public async Task<IEnumerable<GameTagResponse>> GetTagByGameIdAsync(Guid id, CancellationToken token)
+    {
+        return await unitOfWork.GameTagMaps.GetListAsync<GameTagResponse>(m => m.GameId == id, token);
+    }
 }

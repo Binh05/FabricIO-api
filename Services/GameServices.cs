@@ -7,23 +7,35 @@ namespace FabricIO_api.Services;
 
 public class GameServices(IUnitOfWork uof, IMapper mapper) : IGameServices
 {
-    public async Task<IEnumerable<GameDto>> GetAsync(GetGameDto param, CancellationToken token)
+    public Game AddGameTag(Game game, IEnumerable<GameTag> gameTags)
     {
-        var entities = await uof.Games.GetListAsync<GameDto>(g => g.Title.Contains(param.Search), token);
+        var gameTagMaps = gameTags.Select(t => new GameTagMap
+        {
+            GameId = game.Id,
+            TagId = t.Id,
+        });
+
+        game.GameTagMaps = gameTagMaps.ToList();
+
+        return game;
+    }
+
+    public async Task<IEnumerable<GameResponseDto>> GetAsync(GetGameDto param, CancellationToken token)
+    {
+        var entities = await uof.Games.GetListAsync<GameResponseDto>(g => g.Title.Contains(param.Search), token);
 
         return entities;
     }
 
-    public async Task<Game> InsertAsync(GameDto game, CancellationToken token)
+    public async Task InsertAsync(Guid userId, Game game, CancellationToken token)
     {
-        var entity = mapper.Map<Game>(game);
-        uof.Games.Insert(entity);
-        await uof.SaveAsync(token);
+        game.OwnerId = userId;
 
-        return entity;
+        uof.Games.Insert(game);
+        await uof.SaveAsync(token);
     }
 
-    public async Task<IEnumerable<Game>> InsertRangeAsync(IEnumerable<GameDto> games, CancellationToken token)
+    public async Task<IEnumerable<Game>> InsertRangeAsync(IEnumerable<GameRequestDto> games, CancellationToken token)
     {
         var entities = mapper.Map<IEnumerable<Game>>(games);
 
