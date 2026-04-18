@@ -49,9 +49,9 @@ builder.Services.AddDbContext<DbContext, AppDbContext>(options =>
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 //MinIO Config
-var endpoint = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ENDPOINT");
-var accessKey = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ACCESSKEY");
-var secretKeyMinio = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_SECRETKEY");
+var endpoint = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ENDPOINT") ?? builder.Configuration["Storage:AccessKey"];
+var accessKey = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ACCESSKEY") ?? builder.Configuration["Storage:SecterKey"];
+var secretKeyMinio = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_SECRETKEY") ?? builder.Configuration["Storage:EndPoint"];
 
 builder.Services.AddMinio(configureClient => configureClient
     .WithEndpoint(endpoint)

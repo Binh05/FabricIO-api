@@ -21,7 +21,10 @@
       "applicationUrl": "https://localhost:7100;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_CONNECTION": "Host=localhost;Port=5432;Database=Dotnet;Username=postgres;Password=123456"
+        "ASPNETCORE_CONNECTION": "Host=localhost;Port=5432;Database=Dotnet;Username=postgres;Password=123456",
+        "ASPNETCORE_MINIO_ACCESSKEY": "admin",
+        "ASPNETCORE_MINIO_SECRETKEY": "password123",
+        "ASPNETCORE_MINIO_ENDPOINT": "localhost:9000"
       }
     }
   }
