@@ -8,12 +8,7 @@ public class UserProfile : Profile
 {
     public UserProfile()
     {
-        CreateMap<User, UserResponse>().ForMember(dest => dest.Password, opt => opt.Ignore());
-
-        CreateMap<UserResponse, User>().ForMember(
-            desk => desk.HashedPassword,
-            opt => opt.MapFrom(src => src.Password)
-        ).ReverseMap();
+        CreateMap<UserResponse, User>().ReverseMap();
 
         CreateMap<UserRegister, User>().ForMember(dest => dest.HashedPassword, opt => opt.MapFrom(src => src.Password));
 
