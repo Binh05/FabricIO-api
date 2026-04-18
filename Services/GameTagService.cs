@@ -13,13 +13,6 @@ public class GameTagService(IUnitOfWork unitOfWork, IMapper mapper) : IGameTagSe
 
         return entities;
     }
-    public async Task<IEnumerable<GameTag>> ValidTagsAsync(IEnumerable<Guid> tags, CancellationToken token)
-    {
-        var validTags = await unitOfWork.GameTags
-            .GetListAsync<GameTag>(t => tags.Contains(t.Id), token);
-
-        return validTags;
-    }
 
     public async Task<GameTagResponse> InsertTagAsync(GameTagRequest tagReq, CancellationToken token)
     {
@@ -36,10 +29,5 @@ public class GameTagService(IUnitOfWork unitOfWork, IMapper mapper) : IGameTagSe
         var entity = await unitOfWork.GameTags.GetByIdAsync<GameTagResponse>(id, token);
 
         return entity;
-    }
-
-    public async Task<IEnumerable<GameTagResponse>> GetTagByGameIdAsync(Guid id, CancellationToken token)
-    {
-        return await unitOfWork.GameTagMaps.GetListAsync<GameTagResponse>(m => m.GameId == id, token);
     }
 }

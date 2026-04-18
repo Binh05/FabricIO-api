@@ -22,7 +22,7 @@ public class SessionService(IUnitOfWork unitOfWork) : ISessionServices
 
     public async Task<Session> RevokeSessionAsync(string token, CancellationToken cancellationToken)
     {
-        var tokenExisting = await unitOfWork.Sessions.FindOneAsync(s => s.Token == token, cancellationToken);
+        var tokenExisting = await unitOfWork.Sessions.FindOneAsync<Session>(s => s.Token == token, cancellationToken);
         
         if (tokenExisting == null)
         {
@@ -39,7 +39,7 @@ public class SessionService(IUnitOfWork unitOfWork) : ISessionServices
     }
     public async Task<Session> FindOneAsync(Expression<Func<Session, bool>> predicate, CancellationToken cancellationToken)
     {
-        var session = await unitOfWork.Sessions.FindOneAsync(predicate, cancellationToken);
+        var session = await unitOfWork.Sessions.FindOneAsync<Session>(predicate, cancellationToken);
 
         if (session == null || session.IsReVoked || session.ExpiresAt < DateTime.UtcNow)
         {

@@ -54,8 +54,8 @@ public class Repository<T>(IMapper mapper, AppDbContext ctx) : IRepository<T> wh
         return entities;
     }
 
-    public async Task<T?> FindOneAsync(Expression<Func<T, bool>> predicate, CancellationToken token)
+    public async Task<TOut?> FindOneAsync<TOut>(Expression<Func<T, bool>> predicate, CancellationToken token)
     {
-        return await ctx.Set<T>().FirstOrDefaultAsync(predicate, token);
+        return await ctx.Set<T>().Where(predicate).ProjectTo<TOut>(mapper.ConfigurationProvider).FirstOrDefaultAsync(token);
     }
 }

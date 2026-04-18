@@ -11,7 +11,7 @@ namespace FabricIO_api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class GamesController(IGameServices gameServices, IGameTagService gameTagService, IMapper mapper) : ControllerBase
+public class GamesController(IGameServices gameServices) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GameResponseDto>>> GetGamesAsync([FromQuery] GetGameDto param, CancellationToken token)
@@ -24,20 +24,10 @@ public class GamesController(IGameServices gameServices, IGameTagService gameTag
     [HttpPost]
     public async Task<ActionResult<GameResponseDto>> PostGameAsync([FromBody] GameRequestDto gameReq, CancellationToken token)
     {
-        var userId = User.GetUserId();
+        Guid userId = User.GetUserId();
 
-        var entity = mapper.Map<Game>(gameReq);
+        var response = await gameServices.CreateGameAsync(userId, gameReq, token);
 
-        if (gameReq.TagIds != null && gameReq.TagIds.Any())
-        {
-            var validGameTags = await gameTagService.ValidTagsAsync(gameReq.TagIds, token);
-            gameServices.AddGameTag(entity, validGameTags);
-        }
-
-        await gameServices.InsertAsync(userId, entity, token);
-
-        var response = mapper.Map<GameResponseDto>(entity);
-        response.GameTags = await gameTagService.GetTagByGameIdAsync(entity.Id, token);
         return Ok(response);
     }
 
