@@ -11,8 +11,15 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
 
     private readonly IRepository<Game> games = new Repository<Game>(mapper, ctx);
     public IRepository<Game> Games => games;
+
     private readonly IRepository<Session> sessions = new Repository<Session>(mapper, ctx);
     public IRepository<Session> Sessions => sessions;
+
+    private readonly IRepository<GameTag> gameTags = new Repository<GameTag>(mapper, ctx);
+    public IRepository<GameTag> GameTags => gameTags;
+
+    private readonly IRepository<GameTagMap> gameTagMaps = new Repository<GameTagMap>(mapper, ctx);
+    public IRepository<GameTagMap> GameTagMaps => gameTagMaps;
     public async Task SaveAsync(CancellationToken token)
     {
         await ctx.SaveChangesAsync(token);
