@@ -4,6 +4,7 @@ using System.Text;
 using AutoMapper;
 using FabricIO_api.DTOs;
 using FabricIO_api.Entities;
+using FabricIO_api.Middleware;
 using FabricIO_api.UnitOfWork;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -18,7 +19,7 @@ public class AuthServices(IOptionsMonitor<AppSetting> optionsMonitor, IMapper ma
         var usernameExisting = await unitOfWork.Users.FindOneAsync<User>(u => u.Username == userInfo.Username, token);
         if (usernameExisting is not null)
         {
-            throw new Exception("Username đã tồn tại");
+            throw new ConflictException("Username đã tồn tại");
         }
 
         var entity = mapper.Map<User>(userInfo);
@@ -36,7 +37,7 @@ public class AuthServices(IOptionsMonitor<AppSetting> optionsMonitor, IMapper ma
         if (userExisting == null || 
             !BCrypt.Net.BCrypt.Verify(user.Password, userExisting.HashedPassword))
         {
-            throw new Exception("Sai username hoặc password");
+            throw new BadRequestException("Sai username hoặc password");
         }
 
         var refreshToken = GenerateRefreshToken();

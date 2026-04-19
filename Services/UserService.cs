@@ -1,5 +1,6 @@
 using FabricIO_api.DTOs;
 using FabricIO_api.Entities;
+using FabricIO_api.Middleware;
 using FabricIO_api.UnitOfWork;
 
 namespace FabricIO_api.Services;
@@ -12,7 +13,7 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
 
         if (user == null)
         {
-            throw new Exception("User không tồn tại");
+            throw new NotFoundException("User không tồn tại");
         }
 
         user.AvatarUrl = avatarUrl;
@@ -26,7 +27,7 @@ public class UserService(IUnitOfWork unitOfWork) : IUserService
 
         if (user == null)
         {
-            throw new Exception("User khong ton tai");
+            throw new NotFoundException("User khong ton tai");
         }
 
         return user;

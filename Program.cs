@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text;
 using FabricIO_api.DataAccess;
 using FabricIO_api.Entities;
+using FabricIO_api.Middleware;
 using FabricIO_api.Services;
 using FabricIO_api.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -99,6 +100,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.MapControllers();
 

@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using AutoMapper;
 using FabricIO_api.Entities;
+using FabricIO_api.Middleware;
 using FabricIO_api.UnitOfWork;
 
 namespace FabricIO_api.Services;
@@ -26,7 +27,7 @@ public class SessionService(IUnitOfWork unitOfWork) : ISessionServices
         
         if (tokenExisting == null)
         {
-            throw new Exception("Bạn chưa đăng nhập");
+            throw new UnauthorizedException("Bạn chưa đăng nhập");
         }
 
         tokenExisting.IsReVoked = true;
@@ -43,7 +44,7 @@ public class SessionService(IUnitOfWork unitOfWork) : ISessionServices
 
         if (session == null || session.IsReVoked || session.ExpiresAt < DateTime.UtcNow)
         {
-            throw new Exception("Token không hợp lệ hoặc hết hạn");
+            throw new ForbidException("Token không hợp lệ hoặc hết hạn");
         }
 
         return session;

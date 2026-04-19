@@ -1,6 +1,7 @@
 using AutoMapper;
 using FabricIO_api.DTOs;
 using FabricIO_api.Entities;
+using FabricIO_api.Middleware;
 using FabricIO_api.UnitOfWork;
 
 namespace FabricIO_api.Services;
@@ -52,12 +53,12 @@ public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
         var game = await unitOfWork.Games.DeleteAsync(gameId, token);
         if (game == null)
         {
-            throw new Exception();
+            throw new NotFoundException("Game không tồn tại");
         }
 
         if (game.OwnerId != userId)
         {
-            throw new Exception();
+            throw new UnauthorizedException("Bạn không có quyền xóa game này");
         }
         await unitOfWork.SaveAsync(token);
     }
