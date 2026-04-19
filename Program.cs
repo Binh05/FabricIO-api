@@ -86,6 +86,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+var corsName = "allowAll";
+
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy(corsName, policy =>
+    {
+        policy.AllowAnyOrigin();
+        policy.AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -98,6 +109,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors(corsName);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<ExceptionMiddleware>();
