@@ -10,8 +10,24 @@ public class Repository<T>(IMapper mapper, AppDbContext ctx) : IRepository<T> wh
 {
     public async Task<T?> DeleteAsync(Guid id, CancellationToken token)
     {
-        var entity = await ctx.Set<T>().FindAsync([id], token);
-        if (entity is not null)
+        var entity = await ctx.Set<T>().FindAsync(new object[] { id }, token);
+
+        if (entity is null)
+            return null;
+
+        var entry = ctx.Entry(entity);
+        var prop = entry.Metadata.FindProperty("IsDeleted");
+
+        if (prop != null)
+        {
+            var isDeleted = (bool)entry.Property("IsDeleted").CurrentValue!;
+
+            if (!isDeleted)
+            {
+                entry.Property("IsDeleted").CurrentValue = true;
+            }
+        }
+        else
         {
             ctx.Set<T>().Remove(entity);
         }

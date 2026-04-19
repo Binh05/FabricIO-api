@@ -32,18 +32,6 @@ public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
         var result = await unitOfWork.Games.FindOneAsync<GameResponseDto>(g => g.Id == entity.Id, token);
         return result!;
     }
-    public Game AddGameTag(Game game, IEnumerable<GameTag> gameTags)
-    {
-        var gameTagMaps = gameTags.Select(t => new GameTagMap
-        {
-            GameId = game.Id,
-            TagId = t.Id,
-        });
-
-        game.GameTagMaps = gameTagMaps.ToList();
-
-        return game;
-    }
 
     public async Task<IEnumerable<GameResponseDto>> GetAsync(GetGameDto param, CancellationToken token)
     {
@@ -57,6 +45,20 @@ public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
         game.OwnerId = userId;
 
         unitOfWork.Games.Insert(game);
+        await unitOfWork.SaveAsync(token);
+    }
+    public async Task DeleteAsync(Guid userId, Guid gameId, CancellationToken token)
+    {
+        var game = await unitOfWork.Games.DeleteAsync(gameId, token);
+        if (game == null)
+        {
+            throw new Exception();
+        }
+
+        if (game.OwnerId != userId)
+        {
+            throw new Exception();
+        }
         await unitOfWork.SaveAsync(token);
     }
 

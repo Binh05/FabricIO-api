@@ -54,4 +54,13 @@ public class GamesController(IGameServices gameServices) : ControllerBase
 
         return entities;
     }
+    
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteGameAsync([FromRoute] Guid id, CancellationToken token)
+    {
+        var userId = User.GetUserId();
+        await gameServices.DeleteAsync(userId, id, token);
+
+        return NoContent();
+    }
 }
