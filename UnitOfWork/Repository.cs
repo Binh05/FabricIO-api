@@ -26,7 +26,7 @@ public class Repository<T>(IMapper mapper, AppDbContext ctx) : IRepository<T> wh
 
     public async Task<TOut> GetByIdAsync<TOut>(Guid id, CancellationToken token)
     {
-        var entity = await ctx.Set<T>().FindAsync([id], token);
+        var entity = await ctx.Set<T>().Where(e => EF.Property<Guid>(e, "Id") == id).ProjectTo<TOut>(mapper.ConfigurationProvider).FirstOrDefaultAsync(token);
         return mapper.Map<TOut>(entity);
     }
 

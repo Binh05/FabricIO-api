@@ -13,6 +13,22 @@ namespace FabricIO_api.Controllers;
 [Route("api/[controller]")]
 public class GamesController(IGameServices gameServices) : ControllerBase
 {
+    [AllowAnonymous]
+    [HttpGet("{id}")]
+    public async Task<ActionResult<GameResponseDto>> GetByIdAsync([FromRoute] string id, CancellationToken token)
+    {
+        if (!Guid.TryParse(id, out Guid gameId))
+        {
+            return BadRequest();
+        }
+        var response = await gameServices.GetByIdAsync(gameId, token);
+
+        if (response == null)
+            return NotFound();
+
+        return Ok(new { game = response});
+    }
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GameResponseDto>>> GetGamesAsync([FromQuery] GetGameDto param, CancellationToken token)
     {

@@ -5,6 +5,7 @@ namespace FabricIO_api.Services;
 
 public interface IGameServices
 {
+    Task<GameResponseDto> GetByIdAsync(Guid gameId, CancellationToken token);
     Task<GameResponseDto> CreateGameAsync(Guid userId, GameRequestDto gameReq, CancellationToken token);
     Task<IEnumerable<GameResponseDto>> GetAsync(GetGameDto param ,CancellationToken token);
     Task InsertAsync(Guid userId, Game game, CancellationToken token);

@@ -7,6 +7,10 @@ namespace FabricIO_api.Services;
 
 public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameServices
 {
+    public async Task<GameResponseDto> GetByIdAsync(Guid gameId, CancellationToken token)
+    {
+        return await unitOfWork.Games.GetByIdAsync<GameResponseDto>(gameId, token);
+    }
     public async Task<GameResponseDto> CreateGameAsync(Guid userId, GameRequestDto gameReq, CancellationToken token)
     {
         var entity = mapper.Map<Game>(gameReq);
