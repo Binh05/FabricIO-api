@@ -14,7 +14,10 @@ public class AuthController(IAuthServices authServices, ISessionServices session
     {
         var entity = await authServices.RegisterAsync(user, token);
 
-        return Ok(entity);
+        return Ok(new {
+            message = "Đăng ký thành công",
+            entity 
+        });
     }
 
     [HttpPost("login")]
@@ -34,7 +37,7 @@ public class AuthController(IAuthServices authServices, ISessionServices session
 
         await sessionServices.InsertSessionAsync(jwtToken, secureToken.Value.UserId, cancellationToken);
 
-        return NoContent();
+        return Ok(new { message = "Đăng nhập thành công" });
     }
 
     [HttpPost("signout")]
