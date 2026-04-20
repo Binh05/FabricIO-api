@@ -10,7 +10,27 @@ namespace FabricIO_api.Controllers;
 [Route("api/[controller]")]
 public class UsersController(IUserService userService, IStorageServices storageServices) : ControllerBase
 {
-    [HttpPost("avatar")]
+    [HttpGet]
+    public async Task<ActionResult<UserResponse>> FetchMeAsync(CancellationToken token)
+    {
+        var userId = User.GetUserId();
+
+        var user = await userService.GetByIdAsync(userId, token);
+
+        return Ok(user);
+    }
+    
+    [HttpPatch("profile")]
+    public async Task<ActionResult<UserResponse>> UpdateProfileAsync(UpdateUserDto req, CancellationToken token)
+    {
+        var userId = User.GetUserId();
+
+        var res = await userService.UpdateProfileAsync(userId, req, token);
+
+        return Ok(res);
+    }
+
+    [HttpPatch("avatar")]
     public async Task<ActionResult<string>> UploadAvatarAsync(IFormFile file, CancellationToken token)
     {
         if (file == null || file.Length == 0)
@@ -26,13 +46,13 @@ public class UsersController(IUserService userService, IStorageServices storageS
         return Ok(new { avatarUrl = url });
     }
 
-    [HttpGet]
-    public async Task<ActionResult<UserResponse>> FetchMeAsync(CancellationToken token)
+    [HttpPatch("password")]
+    public async Task<ActionResult> ChangePasswordAsync(ChangePasswordDto passwordDto, CancellationToken token)
     {
         var userId = User.GetUserId();
 
-        var user = await userService.GetByIdAsync(userId, token);
+        await userService.ChangePasswordAsync(userId, passwordDto, token);
 
-        return Ok(user);
+        return Ok(new { message = "Đổi mật khẩu thành công" });
     }
 }

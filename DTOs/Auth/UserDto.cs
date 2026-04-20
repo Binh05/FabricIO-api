@@ -11,5 +11,21 @@ public class UserResponse
     public required string Username { get; set; }
     public required string DisplayName { get; set; }
     public string? AvatarUrl { get; set; }
+    public string? Bio { get; set; }
     public string Role { get; set; } = "user";
+}
+
+public class UpdateUserDto
+{
+    public string? Bio { get; set; }
+}
+
+public class ChangePasswordDto
+{
+    [Required]
+    public required string OldPassword { get; set; }
+    [Required]
+    public required string NewPassword { get; set; }
+    [Required]
+    public required string ConfirmPassword { get; set; }
 }
