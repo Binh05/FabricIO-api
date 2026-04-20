@@ -8,7 +8,7 @@ namespace FabricIO_api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(IUserService userService, IStorageServices storageServices) : ControllerBase
+public class UsersController(IUserService userService, IStorageServices storageServices) : ControllerBase
 {
     [HttpPost("avatar")]
     public async Task<ActionResult<string>> UploadAvatarAsync(IFormFile file, CancellationToken token)

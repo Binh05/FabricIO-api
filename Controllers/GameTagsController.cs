@@ -6,7 +6,7 @@ namespace FabricIO_api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class GameTagController(IGameTagService gameTagService) : ControllerBase
+public class GameTagsController(IGameTagService gameTagService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GameTagResponse>>> GetGameTagListAsync(CancellationToken token)

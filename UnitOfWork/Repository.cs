@@ -40,6 +40,11 @@ public class Repository<T>(IMapper mapper, AppDbContext ctx) : IRepository<T> wh
         return await ctx.Set<T>().ProjectTo<TOut>(mapper.ConfigurationProvider).ToListAsync(token);
     }
 
+    public async Task<T?> GetEntityByIdAsync(Guid id, CancellationToken token)
+    {
+        return await ctx.Set<T>().FindAsync([id], token);
+    }
+
     public async Task<TOut> GetByIdAsync<TOut>(Guid id, CancellationToken token)
     {
         var entity = await ctx.Set<T>().Where(e => EF.Property<Guid>(e, "Id") == id).ProjectTo<TOut>(mapper.ConfigurationProvider).FirstOrDefaultAsync(token);
