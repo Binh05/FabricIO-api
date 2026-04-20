@@ -37,19 +37,17 @@ public class AuthController(IAuthServices authServices, ISessionServices session
         return NoContent();
     }
 
-    [Authorize]
     [HttpPost("signout")]
     public async Task<ActionResult> SignOut(CancellationToken cancellationToken)
     {
         var sessionToken = Request.Cookies["token"];
-        if (sessionToken == null)
+        if (sessionToken != null)
         {
-            return BadRequest("Bạn chưa đăng nhập");
+            await sessionServices.RevokeSessionAsync(sessionToken, cancellationToken);
         }
 
         Response.Cookies.Delete("token");
-
-        await sessionServices.RevokeSessionAsync(sessionToken, cancellationToken);
+        
         return NoContent();
     }
 

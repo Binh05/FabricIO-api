@@ -10,5 +10,6 @@ public interface IUnitOfWork
     public IRepository<GameTag> GameTags { get; }
     public IRepository<GameTagMap> GameTagMaps { get; }
     public IRepository<GameFavorite> GameFavorites { get; }
+    public IGameCommentRepository GameComments { get; }
     public Task SaveAsync(CancellationToken token);
 }
