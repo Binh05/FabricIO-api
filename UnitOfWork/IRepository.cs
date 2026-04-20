@@ -11,7 +11,7 @@ public interface IRepository<T>
     Task<IEnumerable<TOut>> GetListAsync<TOut>(Expression<Func<T, bool>> predicate, CancellationToken token);
     T Insert(T entity);
     T Update(T entity);
-    Task<T?> DeleteAsync(Guid id, CancellationToken token);
+    Task<T?> DeleteAsync(Expression<Func<T, bool>> predicate, CancellationToken token);
 
     IEnumerable<T> InsertRange(IEnumerable<T> entities);
 }

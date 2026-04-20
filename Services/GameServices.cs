@@ -50,7 +50,7 @@ public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
     }
     public async Task DeleteAsync(Guid userId, Guid gameId, CancellationToken token)
     {
-        var game = await unitOfWork.Games.DeleteAsync(gameId, token);
+        var game = await unitOfWork.Games.DeleteAsync(g => g.Id == gameId, token);
         if (game == null)
         {
             throw new NotFoundException("Game không tồn tại");

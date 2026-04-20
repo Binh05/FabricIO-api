@@ -8,9 +8,9 @@ namespace FabricIO_api.UnitOfWork;
 
 public class Repository<T>(IMapper mapper, AppDbContext ctx) : IRepository<T> where T : class
 {
-    public async Task<T?> DeleteAsync(Guid id, CancellationToken token)
+    public async Task<T?> DeleteAsync(Expression<Func<T, bool>> predicate, CancellationToken token)
     {
-        var entity = await ctx.Set<T>().FindAsync(new object[] { id }, token);
+        var entity = await ctx.Set<T>().FirstOrDefaultAsync(predicate, token);
 
         if (entity is null)
             return null;

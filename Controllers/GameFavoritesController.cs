@@ -9,6 +9,13 @@ namespace FabricIO_api.Controllers;
 [Route("api/users")]
 public class GameFavoritesController(IGameFavoriteService gameFavoriteService, IUnitOfWork unitOfWork) : ControllerBase
 {
+    [HttpGet("favorite")]
+    public async Task<IEnumerable<GameFavoriteResponse>> Get(CancellationToken token)
+    {
+        var userId = User.GetUserId();
+        return await unitOfWork.GameFavorites.GetListAsync<GameFavoriteResponse>(gf => gf.UserId == userId, token);
+    }
+
     [HttpPost("{id}/favrotite")]
     public async Task<ActionResult>  MarkAsFavorAsync([FromRoute] Guid id, CancellationToken token)
     {
@@ -19,10 +26,13 @@ public class GameFavoritesController(IGameFavoriteService gameFavoriteService, I
         return Created();
     }
 
-    [HttpGet("favorite")]
-    public async Task<IEnumerable<GameFavoriteResponse>> Get(CancellationToken token)
+    [HttpDelete("{gameId}/favorite")]
+    public async Task<IActionResult> UnFavorAsync([FromRoute] Guid gameId, CancellationToken token)
     {
         var userId = User.GetUserId();
-        return await unitOfWork.GameFavorites.GetListAsync<GameFavoriteResponse>(gf => gf.UserId == userId, token);
+
+        await gameFavoriteService.UnFavoriteAsync(userId, gameId, token);
+
+        return Ok(new { message = "Xoá Game khỏi danh sách yêu thích thành công" });
     }
 }
