@@ -16,7 +16,7 @@ public class AuthServices(IOptionsMonitor<AppSetting> optionsMonitor, IMapper ma
     private readonly AppSetting appSetting = optionsMonitor.CurrentValue;
     public async Task<UserResponse> RegisterAsync(UserRegister userInfo, CancellationToken token)
     {
-        var usernameExisting = await unitOfWork.Users.FindOneAsync<User>(u => u.Username == userInfo.Username, token);
+        var usernameExisting = await unitOfWork.Users.FindOneAsync<UserBaseDto>(u => u.Username == userInfo.Username, token);
         if (usernameExisting is not null)
         {
             throw new ConflictException("Username đã tồn tại");
@@ -33,7 +33,7 @@ public class AuthServices(IOptionsMonitor<AppSetting> optionsMonitor, IMapper ma
     }
     public async Task<(string AccessToken, string RefreshToken, Guid UserId)?> LoginAsync(UserLogin user, CancellationToken token)
     {
-        var userExisting = await unitOfWork.Users.FindOneAsync<User>(u => u.Username == user.Username, token);
+        var userExisting = await unitOfWork.Users.FindOneAsync<UserBaseDto>(u => u.Username == user.Username, token);
         if (userExisting == null || 
             !BCrypt.Net.BCrypt.Verify(user.Password, userExisting.HashedPassword))
         {

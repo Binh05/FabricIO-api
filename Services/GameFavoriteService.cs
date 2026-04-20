@@ -8,14 +8,14 @@ public class GameFavoriteService(IUnitOfWork unitOfWork) : IGameFavoriteService
 {
     public async Task MarkAsFavoriteAsync(Guid userId, Guid gameId, CancellationToken token)
     {
-        var userExisting = await unitOfWork.Users.GetEntityByIdAsync(userId, token);
+        var userExisting = await unitOfWork.Users.GetEntityAsync(u => u.Id ==userId, token);
 
         if (userExisting == null)
         {
             throw new NotFoundException("User không tôn tại");
         }
 
-        var gameExisting = await unitOfWork.Games.GetEntityByIdAsync(gameId, token);
+        var gameExisting = await unitOfWork.Games.GetEntityAsync(g => g.Id == gameId, token);
 
         if (gameExisting == null)
         {

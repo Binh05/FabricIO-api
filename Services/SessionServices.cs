@@ -23,7 +23,7 @@ public class SessionService(IUnitOfWork unitOfWork) : ISessionServices
 
     public async Task<Session> RevokeSessionAsync(string token, CancellationToken cancellationToken)
     {
-        var tokenExisting = await unitOfWork.Sessions.FindOneAsync<Session>(s => s.Token == token, cancellationToken);
+        var tokenExisting = await unitOfWork.Sessions.GetEntityAsync(s => s.Token == token, cancellationToken);
         
         if (tokenExisting == null)
         {
@@ -33,7 +33,6 @@ public class SessionService(IUnitOfWork unitOfWork) : ISessionServices
         tokenExisting.IsReVoked = true;
         tokenExisting.UpdatedAt = DateTime.UtcNow;
         
-        unitOfWork.Sessions.Update(tokenExisting);
         await unitOfWork.SaveAsync(cancellationToken);
 
         return tokenExisting;
