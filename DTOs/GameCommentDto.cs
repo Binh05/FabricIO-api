@@ -2,11 +2,17 @@
 
 namespace FabricIO_api.DTOs;
 
+public class CreateGameComment
+{
+    [Required]
+    public required string Content { get; set; }
+}
+
 public class GameCommentResponse
 {
     public Guid Id { get; set; }
     public Guid GameId { get; set; }
-    public Guid UserId { get; set; }
+    public required UserResponse Commentator { get; set; }
     public required string Content { get; set; }
     public DateTime CreatedAt { get; set; }
 }

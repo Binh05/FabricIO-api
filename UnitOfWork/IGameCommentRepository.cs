@@ -5,6 +5,6 @@ namespace FabricIO_api.UnitOfWork
 {
     public interface IGameCommentRepository : IRepository<GameComment>
     {
-        Task<GameCommentPaginationResult> GetPageCommentAsync(GameCommentPagination req, CancellationToken token);
+        Task<GameCommentPaginationResult> GetPageCommentAsync(Guid gameId, PaginationDto req, CancellationToken token);
     }
 }

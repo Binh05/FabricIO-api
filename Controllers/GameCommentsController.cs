@@ -9,10 +9,13 @@ namespace FabricIO_api.Controllers;
 [Route("api/games")]
 public class GameCommentsController(IGameCommentService gameCommentService) : ControllerBase
 {
-    [HttpGet("{GameId}/comment")]
-    public async Task<ActionResult<IEnumerable<GameCommentResponse>>> GetByIdAsync([FromRoute] GameCommentPagination param, CancellationToken token)
+    [HttpGet("{gameId}/comment")]
+    public async Task<ActionResult<IEnumerable<GameCommentResponse>>> GetByIdAsync(
+        [FromRoute] Guid gameId,
+        [FromQuery] PaginationDto param, 
+        CancellationToken token)
     {
-        var res = await gameCommentService.GetCommentsAsync(param, token);
+        var res = await gameCommentService.GetCommentsAsync(gameId, param, token);
         return Ok(res);
     }
 
@@ -20,12 +23,12 @@ public class GameCommentsController(IGameCommentService gameCommentService) : Co
     [HttpPost("{gameId}/comment")]
     public async Task<ActionResult<GameCommentResponse>> PostCommentAsync(
         [FromRoute] Guid gameId,
-        [FromBody] string content,
+        [FromBody] CreateGameComment req,
         CancellationToken token)
     {
         var userId = User.GetUserId();
 
-        var res = await gameCommentService.InsertCommentAsync(userId, gameId, content, token);
+        var res = await gameCommentService.InsertCommentAsync(userId, gameId, req, token);
 
         return Ok(res);
     }

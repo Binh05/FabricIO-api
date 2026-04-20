@@ -8,6 +8,7 @@ public class GameCommentProfile : Profile
 {
     public GameCommentProfile()
     {
-        CreateMap<GameComment, GameCommentResponse>();
+        CreateMap<GameComment, GameCommentResponse>()
+            .ForMember(dest => dest.Commentator, opt => opt.MapFrom(src => src.User));
     }
 }
