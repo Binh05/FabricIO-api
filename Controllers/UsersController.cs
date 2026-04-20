@@ -27,7 +27,7 @@ public class UsersController(IUserService userService, IStorageServices storageS
     }
 
     [HttpGet]
-    public async Task<ActionResult<UserResponse>> GetUserAsync(CancellationToken token)
+    public async Task<ActionResult<UserResponse>> FetchMeAsync(CancellationToken token)
     {
         var userId = User.GetUserId();
 

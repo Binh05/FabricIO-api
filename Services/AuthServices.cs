@@ -57,7 +57,7 @@ public class AuthServices(IOptionsMonitor<AppSetting> optionsMonitor, IMapper ma
 
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(1),
+            expires: DateTime.UtcNow.AddHours(7),
             signingCredentials: creds
         );
 

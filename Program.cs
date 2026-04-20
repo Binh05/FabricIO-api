@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using FabricIO_api.DataAccess;
 using FabricIO_api.Entities;
 using FabricIO_api.Middleware;
@@ -114,6 +115,12 @@ builder.Services.AddCors(opt =>
             .AllowCredentials();
     });
 });
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 var app = builder.Build();
 

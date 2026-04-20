@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace FabricIO_api.Controllers;
 
 [ApiController]
-[Route("api/Games")]
-public class GameInteractionsController(IGameFavoriteService gameFavoriteService, IUnitOfWork unitOfWork) : ControllerBase
+[Route("api/users")]
+public class GameFavoritesController(IGameFavoriteService gameFavoriteService, IUnitOfWork unitOfWork) : ControllerBase
 {
     [HttpPost("{id}/favrotite")]
     public async Task<ActionResult>  MarkAsFavorAsync([FromRoute] Guid id, CancellationToken token)
@@ -18,9 +18,11 @@ public class GameInteractionsController(IGameFavoriteService gameFavoriteService
 
         return Created();
     }
+
     [HttpGet("favorite")]
     public async Task<IEnumerable<GameFavoriteResponse>> Get(CancellationToken token)
     {
-        return await unitOfWork.GameFavorites.GetAllAsync<GameFavoriteResponse>(token);
+        var userId = User.GetUserId();
+        return await unitOfWork.GameFavorites.GetListAsync<GameFavoriteResponse>(gf => gf.UserId == userId, token);
     }
 }
