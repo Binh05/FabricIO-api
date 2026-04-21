@@ -28,4 +28,12 @@ public class GameRatingsController(IGameRatingService gameRatingService) : Contr
 
         return Ok(new { message = $"Đã rating {stars} sao" });
     }
+
+    [HttpDelete("{ratingId}/rating")]
+    public async Task<IActionResult> DeleteRatingAsync([FromRoute] Guid ratingId, CancellationToken token)
+    {
+        await gameRatingService.DeleteAsync(ratingId, token);
+
+        return Ok(new { message = "Xoa thanh cong" });
+    }
 }

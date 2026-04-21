@@ -81,4 +81,10 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
         user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(passwordDto.NewPassword);
         await unitOfWork.SaveAsync(token);
     }
+    public async Task<IEnumerable<UserRatedResponse>> GetRatingsAsync(Guid userId, CancellationToken token)
+    {
+        var data = await unitOfWork.GameRatings.GetListAsync<UserRatedResponse>(r => r.UserId == userId, token);
+
+        return data;
+    }
 }

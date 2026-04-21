@@ -10,4 +10,5 @@ public interface IUserService
     Task<UserResponse> GetByIdAsync(Guid userId, CancellationToken token);
     Task<UserResponse> UpdateProfileAsync(Guid userId, UpdateUserDto user, CancellationToken token);
     Task ChangePasswordAsync(Guid userId, ChangePasswordDto passwordDto, CancellationToken token);
+    Task<IEnumerable<UserRatedResponse>> GetRatingsAsync(Guid userId, CancellationToken token);
 }

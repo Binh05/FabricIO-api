@@ -19,6 +19,16 @@ public class UsersController(IUserService userService, IStorageServices storageS
 
         return Ok(user);
     }
+
+    [HttpGet("ratings")]
+    public async Task<ActionResult<IEnumerable<UserRatedResponse>>> GetRatedAsync(CancellationToken token)
+    {
+        var userId = User.GetUserId();
+
+        var res = await userService.GetRatingsAsync(userId, token);
+
+        return Ok(res);
+    }
     
     [HttpPatch("profile")]
     public async Task<ActionResult<UserResponse>> UpdateProfileAsync(UpdateUserDto req, CancellationToken token)

@@ -11,6 +11,14 @@ public class RatingRequest {
     public int Stars { get; set; }
 }
 
+public class UserRatedResponse
+{
+    public Guid RatingId { get; set; }
+    public int Stars { get; set; }
+    public Guid GameId { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+
 public class UserRatingDisplay
 {
     public UserDisplay User { get; set; } = default!;

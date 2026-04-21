@@ -37,5 +37,16 @@ namespace FabricIO_api.Services
 
             return rating.Stars;
         }
+
+        public async Task DeleteAsync(Guid ratingId, CancellationToken token)
+        {
+            var rating = await unitOfWork.GameRatings.GetEntityAsync(r => r.Id == ratingId, token);
+
+            if (rating != null)
+            {
+                unitOfWork.GameRatings.Delete(rating);
+                await unitOfWork.SaveAsync(token);
+            }
+        }
     }
 }

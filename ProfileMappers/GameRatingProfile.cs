@@ -9,6 +9,8 @@ namespace FabricIO_api.ProfileMappers
         public GameRatingProfile()
         {
             CreateMap<Game, GameRatingResponse>();
+            CreateMap<GameRating, UserRatedResponse>()
+                .ForMember(dest => dest.RatingId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }
