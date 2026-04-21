@@ -15,7 +15,7 @@ public class GameCommentService(IUnitOfWork unitOfWork, IMapper mapper) : IGameC
         return gameComments;
     }
 
-    public async Task<GameCommentResponse> InsertCommentAsync(Guid userId, Guid gameId, CreateGameComment req, CancellationToken token)
+    public async Task<GameCommentResponse> InsertCommentAsync(Guid userId, Guid gameId, GameCommentDto req, CancellationToken token)
     {
         var gameExisting = await unitOfWork.Games.GetEntityAsync(g => g.Id == gameId, token);
         if (gameExisting == null)
@@ -40,7 +40,46 @@ public class GameCommentService(IUnitOfWork unitOfWork, IMapper mapper) : IGameC
         await unitOfWork.SaveAsync(token);
 
         var res = mapper.Map<GameCommentResponse>(entity);
-        res.Commentator = mapper.Map<UserResponse>(userExisting);
+        res.Commentator = mapper.Map<Commentator>(userExisting);
         return res;
+    }
+
+    public async Task<GameCommentResponse> ChangeCommentAsync(Guid userId, Guid commentId, GameCommentDto req, CancellationToken token)
+    {
+        var commentExisting = await unitOfWork.GameComments.GetEntityAsync(c => c.Id == commentId, token);
+
+        if (commentExisting == null)
+        {
+            throw new NotFoundException("Không tìm thấy comment");
+        }
+
+        if (commentExisting.UserId != userId)
+        {
+            throw new UnauthorizedException("Không có quyền sửa comment của người khác");
+        }
+
+        commentExisting.Content = req.Content;
+        commentExisting.UpdatedAt = DateTime.UtcNow;
+        await unitOfWork.SaveAsync(token);
+
+        return mapper.Map<GameCommentResponse>(commentExisting);
+    }
+
+    public async Task DeleteCommentAsync(Guid userId, UserRole role, Guid commentId, CancellationToken token)
+    {
+        var comment = await unitOfWork.GameComments.GetEntityAsync(c => c.Id == commentId, token);
+
+        if (comment == null)
+        {
+            throw new NotFoundException("Comment không tồn tại");
+        }
+
+        if (comment.UserId != userId && role != UserRole.Admin)
+        {
+            throw new UnauthorizedException("Không có quyền xóa comment");
+        }
+
+        unitOfWork.GameComments.Delete(comment);
+        await unitOfWork.SaveAsync(token);
     }
 }

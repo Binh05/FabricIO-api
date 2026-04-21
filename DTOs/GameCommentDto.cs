@@ -2,7 +2,7 @@
 
 namespace FabricIO_api.DTOs;
 
-public class CreateGameComment
+public class GameCommentDto
 {
     [Required]
     public required string Content { get; set; }
@@ -12,15 +12,27 @@ public class GameCommentResponse
 {
     public Guid Id { get; set; }
     public Guid GameId { get; set; }
-    public required UserResponse Commentator { get; set; }
-    public required string Content { get; set; }
+    public required Commentator Commentator { get; set; }
+    public required CommentResponse Comment { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
 }
 
-public class GameCommentPagination : PaginationDto
+public class Commentator
 {
+    public Guid? Id { get; set; }
+    [EmailAddress]
     [Required]
-    public Guid GameId { get; set; }
+    public required string Email { get; set; }
+    public required string DisplayName { get; set; }
+    public string? AvatarUrl { get; set; }
+    public required string Role { get; set; }
+}
+
+public class CommentResponse
+{
+    public Guid Id { get; set; }
+    public required string Content { get; set; }
 }
 
 public class GameCommentPaginationResult : PaginationDto

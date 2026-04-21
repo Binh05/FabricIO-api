@@ -6,7 +6,7 @@ namespace FabricIO_api.Services;
 
 public interface IAuthServices
 {
-    string GenerateJwtToken(Guid userId);
+    string GenerateJwtToken(Guid userId, UserRole role);
     string GenerateRefreshToken();
     Task<UserResponse> RegisterAsync(UserRegister userInfo, CancellationToken token);
     Task<(string AccessToken, string RefreshToken, Guid UserId)?> LoginAsync(UserLogin user, CancellationToken token);

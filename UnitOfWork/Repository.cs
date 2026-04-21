@@ -8,13 +8,8 @@ namespace FabricIO_api.UnitOfWork;
 
 public class Repository<T>(IMapper mapper, AppDbContext ctx) : IRepository<T> where T : class
 {
-    public async Task<T?> DeleteAsync(Expression<Func<T, bool>> predicate, CancellationToken token)
+    public T Delete(T entity)
     {
-        var entity = await ctx.Set<T>().FirstOrDefaultAsync(predicate, token);
-
-        if (entity is null)
-            return null;
-
         var entry = ctx.Entry(entity);
         var prop = entry.Metadata.FindProperty("IsDeleted");
 

@@ -10,6 +10,7 @@ using Microsoft.OpenApi;
 using Minio;
 using System.Net;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -91,7 +92,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes)
+        IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+        RoleClaimType = ClaimTypes.Role
     };
 
     opt.Events = new JwtBearerEvents

@@ -50,7 +50,7 @@ public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
     }
     public async Task DeleteAsync(Guid userId, Guid gameId, CancellationToken token)
     {
-        var game = await unitOfWork.Games.DeleteAsync(g => g.Id == gameId, token);
+        var game = await unitOfWork.Games.GetEntityAsync(g => g.Id == gameId, token);
         if (game == null)
         {
             throw new NotFoundException("Game không tồn tại");
@@ -60,6 +60,8 @@ public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
         {
             throw new UnauthorizedException("Bạn không có quyền xóa game này");
         }
+
+        unitOfWork.Games.Delete(game);
         await unitOfWork.SaveAsync(token);
     }
 

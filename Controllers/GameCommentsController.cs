@@ -23,7 +23,7 @@ public class GameCommentsController(IGameCommentService gameCommentService) : Co
     [HttpPost("{gameId}/comment")]
     public async Task<ActionResult<GameCommentResponse>> PostCommentAsync(
         [FromRoute] Guid gameId,
-        [FromBody] CreateGameComment req,
+        [FromBody] GameCommentDto req,
         CancellationToken token)
     {
         var userId = User.GetUserId();
@@ -31,5 +31,30 @@ public class GameCommentsController(IGameCommentService gameCommentService) : Co
         var res = await gameCommentService.InsertCommentAsync(userId, gameId, req, token);
 
         return Ok(res);
+    }
+
+    [Authorize]
+    [HttpPatch("{commentId}/comment")]
+    public async Task<ActionResult<GameCommentResponse>> PatchCommentAsync(
+        [FromRoute] Guid commentId,
+        [FromBody] GameCommentDto req,
+        CancellationToken token)
+    {
+        var userId = User.GetUserId();
+
+        var res = await gameCommentService.ChangeCommentAsync(userId, commentId, req, token);
+
+        return Ok(new { message = "Chinh sua comment thanh cong", data = res });
+    }
+
+    [HttpDelete("{commentId}/comment")]
+    public async Task<IActionResult> DeleteCommentAsync([FromRoute] Guid commentId, CancellationToken token)
+    {
+        var userId = User.GetUserId();
+        var role = User.GetRole();
+
+        await gameCommentService.DeleteCommentAsync(userId, role, commentId, token);
+
+        return Ok(new { message = "Xóa comment thành công" });
     }
 }

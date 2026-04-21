@@ -16,6 +16,7 @@ public class GameCommentConfiguration : IEntityTypeConfiguration<GameComment>
         builder.HasOne(c => c.Game)
             .WithMany(g => g.GameComments)
             .HasForeignKey(c => c.GameId);
+        builder.HasQueryFilter(c => !c.IsDeleted);
     }
 }
 

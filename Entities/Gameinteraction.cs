@@ -32,6 +32,7 @@ public class GameComment
     public required string Content { get; set; }
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; }
 
     //
     public Game Game { get; set; } = null!;
