@@ -43,7 +43,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // DbContext Config
-builder.Services.AddDbContext<DbContext, AppDbContext>(options =>
+builder.Services.AddDbContext<AppDbContext>(options =>
 {
     var connectionString = Environment.GetEnvironmentVariable("ASPNETCORE_CONNECTION") ?? builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseNpgsql(connectionString);
@@ -51,9 +51,9 @@ builder.Services.AddDbContext<DbContext, AppDbContext>(options =>
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 //MinIO Config
-var endpoint = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ENDPOINT") ?? builder.Configuration["Storage:AccessKey"];
-var accessKey = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ACCESSKEY") ?? builder.Configuration["Storage:SecterKey"];
-var secretKeyMinio = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_SECRETKEY") ?? builder.Configuration["Storage:EndPoint"];
+var endpoint = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ENDPOINT") ?? builder.Configuration["Storage:EndPoint"];
+var accessKey = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ACCESSKEY") ?? builder.Configuration["Storage:AccessKey"];
+var secretKeyMinio = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_SECRETKEY") ?? builder.Configuration["Storage:SecretKey"];
 
 builder.Services.AddMinio(configureClient => configureClient
     .WithEndpoint(endpoint)
@@ -70,6 +70,7 @@ builder.Services.AddScoped<ISessionServices, SessionService>();
 builder.Services.AddScoped<IStorageServices, StorageServices>();
 builder.Services.AddScoped<IGameTagService, GameTagService>();
 builder.Services.AddScoped<IGameFavoriteService, GameFavoriteService>();
+builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
 
 var secretKey = builder.Configuration["AppSettings:SecretKey"];

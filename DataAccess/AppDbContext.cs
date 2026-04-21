@@ -19,10 +19,13 @@ public class AppDbContext: DbContext
     public DbSet<Post> Posts { get; set; }
     public DbSet<PostComment> PostComments { get; set; }
     public DbSet<PostReaction> PostReactions { get; set; }
+    public DbSet<PostMedia> PostMedias { get; set; }
     public DbSet<Follow> Follows { get; set; }
     public DbSet<Block> Blocks { get; set; }
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Session> Sessions { get; set; }
+
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

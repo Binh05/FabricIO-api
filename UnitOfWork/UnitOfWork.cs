@@ -22,6 +22,13 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
     public IRepository<GameTagMap> GameTagMaps => gameTagMaps;
     private readonly IRepository<GameFavorite> gameFavorites = new Repository<GameFavorite>(mapper, ctx);
     public IRepository<GameFavorite> GameFavorites => gameFavorites;
+
+    private readonly IRepository<Post> posts = new Repository<Post>(mapper, ctx);
+    public IRepository<Post> Posts => posts;
+
+    private readonly IRepository<PostMedia> postMedias = new Repository<PostMedia>(mapper, ctx);
+    public IRepository<PostMedia> PostMedias => postMedias;
+
     public async Task SaveAsync(CancellationToken token)
     {
         await ctx.SaveChangesAsync(token);

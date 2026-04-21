@@ -15,6 +15,17 @@ public class Post
     public User Author { get; set; } = null!;
     public ICollection<PostComment> Comments { get; set; } = new List<PostComment>();
     public ICollection<PostReaction> Reactions { get; set; } = new List<PostReaction>();
+    public ICollection<PostMedia> Media { get; set; } = new List<PostMedia>();
+}
+
+public class PostMedia
+{
+    public Guid Id { get; set; }
+    public Guid PostId { get; set; }
+    public required string MediaUrl { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public Post Post { get; set; } = null!;
 }
 
 public class PostComment
