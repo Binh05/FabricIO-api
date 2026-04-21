@@ -12,13 +12,13 @@ public class GameCommentResponse
 {
     public Guid Id { get; set; }
     public Guid GameId { get; set; }
-    public required Commentator Commentator { get; set; }
+    public required UserDisplay Commentator { get; set; }
     public required CommentResponse Comment { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }
 
-public class Commentator
+public class UserDisplay
 {
     public Guid? Id { get; set; }
     [EmailAddress]

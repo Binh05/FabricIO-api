@@ -40,7 +40,7 @@ public class GameCommentService(IUnitOfWork unitOfWork, IMapper mapper) : IGameC
         await unitOfWork.SaveAsync(token);
 
         var res = mapper.Map<GameCommentResponse>(entity);
-        res.Commentator = mapper.Map<Commentator>(userExisting);
+        res.Commentator = mapper.Map<UserDisplay>(userExisting);
         return res;
     }
 
