@@ -58,9 +58,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 //MinIO Config
-var accessKey = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ENDPOINT") ?? builder.Configuration["Storage:AccessKey"];
-var secretKeyMinio = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ACCESSKEY") ?? builder.Configuration["Storage:SecretKey"];
-var endpoint = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_SECRETKEY") ?? builder.Configuration["Storage:EndPoint"];
+var accessKey = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ACCESSKEY") ?? builder.Configuration["Storage:AccessKey"];
+var secretKeyMinio = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_SECRETKEY") ?? builder.Configuration["Storage:SecretKey"];
+var endpoint = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ENDPOINT") ?? builder.Configuration["Storage:EndPoint"];
 
 builder.Services.AddMinio(configureClient => configureClient
     .WithEndpoint(endpoint)
@@ -74,7 +74,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGameServices, GameServices>();
 builder.Services.AddScoped<IAuthServices, AuthServices>();
 builder.Services.AddScoped<ISessionServices, SessionService>();
-builder.Services.AddScoped<IStorageServices, StorageServices>();
+builder.Services.AddScoped<IStorageService, StorageServices>();
 builder.Services.AddScoped<IGameTagService, GameTagService>();
 builder.Services.AddScoped<IGameFavoriteService, GameFavoriteService>();
 builder.Services.AddScoped<IGameCommentService, GameCommentService>();

@@ -36,6 +36,8 @@ services:
       mc alias set myminio http://storage:9000 admin password123;
       mc anonymous set download myminio/game-assets;
       mc anonymous set download myminio/file/avatar;
+      mc mb myminio/game-assets
+      mc retention clear myminio/game-assets
       mc cp --attr "Content-Type=application/javascript;Content-Encoding=br" \
       alias/bucket-name/path/to/KatanaRushDijkstraWeb.framework.js.br \
       alias/bucket-name/path/to/KatanaRushDijkstraWeb.framework.js.br

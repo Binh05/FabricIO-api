@@ -6,8 +6,9 @@ using FabricIO_api.UnitOfWork;
 
 namespace FabricIO_api.Services;
 
-public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameServices
+public class GameServices(IUnitOfWork unitOfWork, IMapper mapper, IStorageService storageService) : IGameServices
 {
+    private readonly string gameBucket = "game-assets";
     public async Task<GameResponseDto> GetByIdAsync(Guid gameId, CancellationToken token)
     {
         return await unitOfWork.Games.GetByIdAsync<GameResponseDto>(gameId, token);
@@ -15,6 +16,32 @@ public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
     public async Task<GameResponseDto> CreateGameAsync(Guid userId, GameRequestDto gameReq, CancellationToken token)
     {
         var entity = mapper.Map<Game>(gameReq);
+        entity.Id = Guid.NewGuid();
+
+        if (gameReq.Thumbnail != null)
+        {
+            var thumbKey = $"{entity.Id}/thumbnails/{entity.Id}.png";
+            await storageService.UploadFileAsync(gameReq.Thumbnail, "game-assets", thumbKey, token);
+            entity.ThumbnailUrl = storageService.GetPublicUrl(thumbKey);
+        }
+
+        //if (gameReq.GameType == GameType.Browser)
+        //{
+        if (gameReq.GameFile == null)
+            throw new Exception("Browser game cần file zip");
+
+        var zipPath = Path.GetTempFileName();
+
+        using (var stream = File.Create(zipPath))
+        {
+            await gameReq.GameFile.CopyToAsync(stream);
+        }
+
+        var path = await storageService.ExtractAndUploadAsync(zipPath, entity.Id, token);
+        await storageService.UploadFileAsync(gameReq.GameFile, gameBucket, $"{path}/source.zip", token);
+
+        entity.GameUrl = storageService.GetPublicUrl($"{path}/index.html");
+        //}
 
         if (gameReq.TagIds != null && gameReq.TagIds.Any())
         {
@@ -32,6 +59,16 @@ public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 
         var result = await unitOfWork.Games.FindOneAsync<GameResponseDto>(g => g.Id == entity.Id, token);
         return result!;
+    }
+
+    public async Task<string> GetPlayUrlAsync(Guid gameId, CancellationToken token)
+    {
+        var game = await unitOfWork.Games.GetEntityAsync(g => g.Id == gameId, token);
+
+        if (game == null || game.GameType != GameType.Browser)
+            throw new Exception("Game không hỗ trợ play");
+
+        return game.GameUrl!;
     }
 
     public async Task<IEnumerable<GameResponseDto>> GetAsync(GetGameDto param, CancellationToken token)
@@ -63,6 +100,8 @@ public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
 
         unitOfWork.Games.Delete(game);
         await unitOfWork.SaveAsync(token);
+
+        await storageService.DeleteFolderAsync(gameBucket, $"{gameId}/", token);
     }
 
     public async Task<IEnumerable<Game>> InsertRangeAsync(IEnumerable<GameRequestDto> games, CancellationToken token)
@@ -73,5 +112,12 @@ public class GameServices(IUnitOfWork unitOfWork, IMapper mapper) : IGameService
         await unitOfWork.SaveAsync(token);
 
         return entities;
+    }
+
+    public async Task<GameDownloadDto> DownloadGameAsync(Guid gameId, CancellationToken token)
+    {
+        var url = await storageService.DownloadFileAync(gameId, token);
+
+        return new GameDownloadDto { DownloadUrl = url };
     }
 }

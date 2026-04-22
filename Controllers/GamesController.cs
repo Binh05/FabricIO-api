@@ -36,9 +36,28 @@ public class GamesController(IGameServices gameServices) : ControllerBase
 
         return Ok(new { GameTotal = entities.Count(), games = entities});
     }
+
+    [AllowAnonymous]
+    [HttpGet("{gameId}/play")]
+    public async Task<ActionResult<GamePlayResponseDto>> GetGameUrlAsync([FromRoute] Guid gameId, CancellationToken token)
+    {
+        var url = await gameServices.GetPlayUrlAsync(gameId, token);
+
+        return Ok(new { GameUrl = url });
+    }
+
+    [HttpGet("{gameId}/download")]
+    public async Task<ActionResult<GameDownloadDto>> DownloadGameAsync([FromRoute] Guid gameId, CancellationToken token)
+    {
+        var data = await gameServices.DownloadGameAsync(gameId, token);
+
+        return Ok(data);
+    }
     
     [HttpPost]
-    public async Task<ActionResult<GameResponseDto>> PostGameAsync([FromBody] GameRequestDto gameReq, CancellationToken token)
+    [Consumes("multipart/form-data")]
+    [RequestSizeLimit(524288000)]
+    public async Task<ActionResult<GameResponseDto>> CreateGameAsync([FromForm] GameRequestDto gameReq, CancellationToken token)
     {
         Guid userId = User.GetUserId();
 
