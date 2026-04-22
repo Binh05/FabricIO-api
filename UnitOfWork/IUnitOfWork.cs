@@ -12,5 +12,6 @@ public interface IUnitOfWork
     public IRepository<GameFavorite> GameFavorites { get; }
     public IGameCommentRepository GameComments { get; }
     public IGameRatingRepository GameRatings { get; }
+    public IRepository<GamePurchase> GamePurchases { get; }
     public Task SaveAsync(CancellationToken token);
 }

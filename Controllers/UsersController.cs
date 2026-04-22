@@ -11,6 +11,16 @@ namespace FabricIO_api.Controllers;
 public class UsersController(IUserService userService, IStorageServices storageServices) : ControllerBase
 {
     [HttpGet]
+    public async Task<ActionResult<IEnumerable<UserResponse>>> GetAllAsync(CancellationToken token)
+    {
+        var role = User.GetRole();
+
+        var data = await userService.GetAllAsync(role, token);
+
+        return Ok(data);
+    }
+
+    [HttpGet("me")]
     public async Task<ActionResult<UserResponse>> FetchMeAsync(CancellationToken token)
     {
         var userId = User.GetUserId();
@@ -18,6 +28,16 @@ public class UsersController(IUserService userService, IStorageServices storageS
         var user = await userService.GetByIdAsync(userId, token);
 
         return Ok(user);
+    }
+
+    [HttpGet("mygame")]
+    public async Task<ActionResult<IEnumerable<GameCardDto>>> GetMyGameAsync(CancellationToken token)
+    {
+        var userId = User.GetUserId();
+
+        var data = await userService.GetMyGameAsync(userId, token);
+
+        return Ok(data);
     }
 
     [HttpGet("ratings")]
@@ -28,6 +48,26 @@ public class UsersController(IUserService userService, IStorageServices storageS
         var res = await userService.GetRatingsAsync(userId, token);
 
         return Ok(res);
+    }
+
+    [HttpGet("gamepaid")]
+    public async Task<ActionResult<IEnumerable<GameCardDto>>> GetGamePaidAsync(CancellationToken token)
+    {
+        var userId = User.GetUserId();
+
+        var data = await userService.GetGamePaidAsync(userId, token);
+
+        return Ok(data);
+    }
+
+    [HttpGet("gamefavorite")]
+    public async Task<ActionResult<IEnumerable<GameCardDto>>> GetGameFavoriteAsync(CancellationToken token)
+    {
+        Guid userId = User.GetUserId();
+
+        var data = await userService.GetGameFavoritesAsync(userId, token);
+
+        return Ok(data);
     }
     
     [HttpPatch("profile")]

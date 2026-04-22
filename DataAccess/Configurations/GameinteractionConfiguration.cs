@@ -60,7 +60,7 @@ public class GamePurchaseConfiguration : IEntityTypeConfiguration<GamePurchase>
         builder.Property(p => p.AmountPaid).HasColumnType("decimal(18,2)");
         builder.HasOne(p => p.Buyer)
             .WithMany(u => u.GamePurchases)
-            .HasForeignKey(p => p.Id);
+            .HasForeignKey(p => p.BuyerId);
         builder.HasOne(p => p.Game)
             .WithMany(g => g.GamePurchases)
             .HasForeignKey(p => p.GameId);

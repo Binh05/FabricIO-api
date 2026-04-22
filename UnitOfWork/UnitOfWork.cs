@@ -29,6 +29,9 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
 
     private readonly IGameRatingRepository gameRatings = new GameRatingRepository(mapper, ctx);
     public IGameRatingRepository GameRatings => gameRatings;
+
+    private readonly IRepository<GamePurchase> gamePurchases = new Repository<GamePurchase>(mapper, ctx);
+    public IRepository<GamePurchase> GamePurchases => gamePurchases;
     public async Task SaveAsync(CancellationToken token)
     {
         await ctx.SaveChangesAsync(token);

@@ -8,6 +8,15 @@ namespace FabricIO_api.Services;
 
 public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
 {
+    public async Task<IEnumerable<UserResponse>> GetAllAsync(UserRole role, CancellationToken token)
+    {
+        if (role != UserRole.Admin)
+        {
+            throw new ForbidException("Không có quyền gọi api");
+        }
+
+        return await unitOfWork.Users.GetAllAsync<UserResponse>(token);
+    }
     public async Task UpdateAvatarAsync(Guid userId, string avatarUrl, CancellationToken token)
     {
         var user = await unitOfWork.Users.GetByIdAsync<User>(userId, token);
@@ -86,5 +95,23 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
         var data = await unitOfWork.GameRatings.GetListAsync<UserRatedResponse>(r => r.UserId == userId, token);
 
         return data;
+    }
+    public async Task<IEnumerable<GameCardDto>> GetGamePaidAsync(Guid userId, CancellationToken token)
+    {
+        var data = await unitOfWork.GamePurchases.GetListAsync<GameCardDto>(p => p.BuyerId == userId, token);
+
+        return data;
+    }
+
+    public async Task<IEnumerable<GameCardDto>> GetGameFavoritesAsync(Guid userId, CancellationToken token)
+    {
+        var data = await unitOfWork.GameFavorites.GetListAsync<GameCardDto>(p => p.UserId == userId, token);
+
+        return data;
+    }
+
+    public async Task<IEnumerable<GameCardDto>> GetMyGameAsync(Guid userId, CancellationToken token)
+    {
+        return await unitOfWork.Games.GetListAsync<GameCardDto>(g => g.OwnerId == userId, token);
     }
 }
