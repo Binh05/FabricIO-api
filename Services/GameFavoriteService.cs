@@ -34,12 +34,15 @@ public class GameFavoriteService(IUnitOfWork unitOfWork) : IGameFavoriteService
 
     public async Task UnFavoriteAsync(Guid userId, Guid gameId, CancellationToken token)
     {
-        var entity = await unitOfWork.GameFavorites.DeleteAsync(gf => gf.UserId == userId && gf.GameId == gameId, token);
 
+        var entity = await unitOfWork.GameFavorites.GetEntityAsync(gf => gf.UserId == userId && gf.GameId == gameId, token);
         if (entity == null)
         {
             throw new NotFoundException("Bạn không có game này trong danh sách yêu thích");
         }
+
+        unitOfWork.GameFavorites.Delete(entity);
+
         await unitOfWork.SaveAsync(token);
     }
 }

@@ -20,6 +20,7 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
 
     private readonly IRepository<GameTagMap> gameTagMaps = new Repository<GameTagMap>(mapper, ctx);
     public IRepository<GameTagMap> GameTagMaps => gameTagMaps;
+
     private readonly IRepository<GameFavorite> gameFavorites = new Repository<GameFavorite>(mapper, ctx);
     public IRepository<GameFavorite> GameFavorites => gameFavorites;
 
@@ -29,6 +30,14 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
     private readonly IRepository<PostMedia> postMedias = new Repository<PostMedia>(mapper, ctx);
     public IRepository<PostMedia> PostMedias => postMedias;
 
+    private readonly IGameCommentRepository gameComments = new GameCommentRepository(mapper, ctx);
+    public IGameCommentRepository GameComments => gameComments;
+
+    private readonly IGameRatingRepository gameRatings = new GameRatingRepository(mapper, ctx);
+    public IGameRatingRepository GameRatings => gameRatings;
+
+    private readonly IRepository<GamePurchase> gamePurchases = new Repository<GamePurchase>(mapper, ctx);
+    public IRepository<GamePurchase> GamePurchases => gamePurchases;
     public async Task SaveAsync(CancellationToken token)
     {
         await ctx.SaveChangesAsync(token);

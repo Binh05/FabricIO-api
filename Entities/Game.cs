@@ -8,8 +8,7 @@ public class Game
     public string? Description { get; set; }
     public string? ThumbnailUrl { get; set; }
     public GameType GameType { get; set; }
-    public string? GameUrl { get; set; }     
-    public string? GameKey { get; set; }   // for downloadable games
+    public string? GameUrl { get; set; }
     public decimal Price { get; set; } = 0;
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }

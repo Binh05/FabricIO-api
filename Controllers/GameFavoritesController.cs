@@ -7,14 +7,8 @@ namespace FabricIO_api.Controllers;
 
 [ApiController]
 [Route("api/users")]
-public class GameFavoritesController(IGameFavoriteService gameFavoriteService, IUnitOfWork unitOfWork) : ControllerBase
+public class GameFavoritesController(IGameFavoriteService gameFavoriteService) : ControllerBase
 {
-    [HttpGet("favorite")]
-    public async Task<IEnumerable<GameFavoriteResponse>> Get(CancellationToken token)
-    {
-        var userId = User.GetUserId();
-        return await unitOfWork.GameFavorites.GetListAsync<GameFavoriteResponse>(gf => gf.UserId == userId, token);
-    }
 
     [HttpPost("{id}/favrotite")]
     public async Task<ActionResult>  MarkAsFavorAsync([FromRoute] Guid id, CancellationToken token)

@@ -8,9 +8,19 @@ namespace FabricIO_api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(IUserService userService, IStorageServices storageServices) : ControllerBase
+public class UsersController(IUserService userService, IStorageService storageService) : ControllerBase
 {
     [HttpGet]
+    public async Task<ActionResult<IEnumerable<UserResponse>>> GetAllAsync(CancellationToken token)
+    {
+        var role = User.GetRole();
+
+        var data = await userService.GetAllAsync(role, token);
+
+        return Ok(data);
+    }
+
+    [HttpGet("me")]
     public async Task<ActionResult<UserResponse>> FetchMeAsync(CancellationToken token)
     {
         var userId = User.GetUserId();
@@ -18,6 +28,56 @@ public class UsersController(IUserService userService, IStorageServices storageS
         var user = await userService.GetByIdAsync(userId, token);
 
         return Ok(user);
+    }
+
+    [HttpGet("mygame")]
+    public async Task<ActionResult<IEnumerable<GameCardDto>>> GetMyGameAsync(CancellationToken token)
+    {
+        var userId = User.GetUserId();
+
+        var data = await userService.GetMyGameAsync(userId, token);
+
+        return Ok(data);
+    }
+
+    [HttpGet("ratings")]
+    public async Task<ActionResult<IEnumerable<UserRatedResponse>>> GetRatedAsync(CancellationToken token)
+    {
+        var userId = User.GetUserId();
+
+        var res = await userService.GetRatingsAsync(userId, token);
+
+        return Ok(res);
+    }
+
+    [HttpGet("gamepaid")]
+    public async Task<ActionResult<IEnumerable<GameCardDto>>> GetGamePaidAsync(CancellationToken token)
+    {
+        var userId = User.GetUserId();
+
+        var data = await userService.GetGamePaidAsync(userId, token);
+
+        return Ok(data);
+    }
+
+    [HttpGet("gamefavorite")]
+    public async Task<ActionResult<IEnumerable<GameCardDto>>> GetGameFavoriteAsync(CancellationToken token)
+    {
+        Guid userId = User.GetUserId();
+
+        var data = await userService.GetGameFavoritesAsync(userId, token);
+
+        return Ok(data);
+    }
+
+    [HttpPost("{userId}/gameban")]
+    public async Task<IActionResult> BanUploadGameAsync([FromRoute] Guid userId, CancellationToken token)
+    {
+        var role = User.GetRole();
+
+        var usernameBaned = await userService.BanUploadGame(userId, role, token);
+
+        return Ok(new { message = $"Đã ban người chơi {usernameBaned} upload game"});
     }
     
     [HttpPatch("profile")]
@@ -39,7 +99,7 @@ public class UsersController(IUserService userService, IStorageServices storageS
         }
         var userId = User.GetUserId();
         
-        var url = await storageServices.UploadAsync(file, token);
+        var url = await storageService.UploadFileAsync(file, "file", userId.ToString(), token);
 
         await userService.UpdateAvatarAsync(userId, url, token);
 

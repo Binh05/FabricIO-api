@@ -8,6 +8,15 @@ namespace FabricIO_api.Services;
 
 public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
 {
+    public async Task<IEnumerable<UserResponse>> GetAllAsync(UserRole role, CancellationToken token)
+    {
+        if (role != UserRole.Admin)
+        {
+            throw new ForbidException("Không có quyền gọi api");
+        }
+
+        return await unitOfWork.Users.GetAllAsync<UserResponse>(token);
+    }
     public async Task UpdateAvatarAsync(Guid userId, string avatarUrl, CancellationToken token)
     {
         var user = await unitOfWork.Users.GetByIdAsync<User>(userId, token);
@@ -80,5 +89,49 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
 
         user.HashedPassword = BCrypt.Net.BCrypt.HashPassword(passwordDto.NewPassword);
         await unitOfWork.SaveAsync(token);
+    }
+    public async Task<IEnumerable<UserRatedResponse>> GetRatingsAsync(Guid userId, CancellationToken token)
+    {
+        var data = await unitOfWork.GameRatings.GetListAsync<UserRatedResponse>(r => r.UserId == userId, token);
+
+        return data;
+    }
+    public async Task<IEnumerable<GameCardDto>> GetGamePaidAsync(Guid userId, CancellationToken token)
+    {
+        var data = await unitOfWork.GamePurchases.GetListAsync<GameCardDto>(p => p.BuyerId == userId, token);
+
+        return data;
+    }
+
+    public async Task<IEnumerable<GameCardDto>> GetGameFavoritesAsync(Guid userId, CancellationToken token)
+    {
+        var data = await unitOfWork.GameFavorites.GetListAsync<GameCardDto>(p => p.UserId == userId, token);
+
+        return data;
+    }
+
+    public async Task<IEnumerable<GameCardDto>> GetMyGameAsync(Guid userId, CancellationToken token)
+    {
+        return await unitOfWork.Games.GetListAsync<GameCardDto>(g => g.OwnerId == userId, token);
+    }
+
+    public async Task<string> BanUploadGame(Guid userId, UserRole adminRole, CancellationToken token)
+    {
+        if (adminRole != UserRole.Admin)
+        {
+            throw new ForbidException("Không có quyền cấm người chơi khác");
+        }
+
+        var user = await unitOfWork.Users.GetEntityAsync(u => u.Id == userId, token);
+        if (user == null)
+        {
+            throw new NotFoundException("User bị ban không tồn tại");
+        }
+
+        user.IsGameBanned = true;
+        unitOfWork.Users.Update(user);
+        await unitOfWork.SaveAsync(token);
+
+        return user.Username;
     }
 }

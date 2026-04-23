@@ -10,6 +10,10 @@ public class UserResponse
     public required string Email { get; set; }
     public required string Username { get; set; }
     public required string DisplayName { get; set; }
+    public bool IsBanned { get; set; }
+    public DateTime? BanExpiresAt { get; set; }
+    public bool IsPostBanned { get; set; }
+    public bool IsGameBanned { get; set; }
     public string? AvatarUrl { get; set; }
     public string? Bio { get; set; }
     public string Role { get; set; } = "user";
@@ -28,4 +32,21 @@ public class ChangePasswordDto
     public required string NewPassword { get; set; }
     [Required]
     public required string ConfirmPassword { get; set; }
+}
+public class GameCardDto
+{
+    public Guid Id { get; set; }
+    public Guid OwnerId { get; set; }
+    public required string Title { get; set; }
+    public string? Description { get; set; }
+    public string? ThumbnailUrl { get; set; }
+    public decimal Price { get; set; }
+}
+
+public class UserRatedResponse
+{
+    public Guid RatingId { get; set; }
+    public int Stars { get; set; }
+    public required GameCardDto Game { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

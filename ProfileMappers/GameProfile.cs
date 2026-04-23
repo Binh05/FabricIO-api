@@ -12,5 +12,7 @@ public class GameProfile: Profile
         CreateMap<GameRequestDto, Game>();
         CreateMap<Game, GameResponseDto>().ForMember(dest => dest.GameTags, opt => opt.MapFrom(g => g.GameTagMaps));
         CreateMap<Game, GameRequestDto>();
+
+        CreateMap<Game, GameCardDto>();
     }
 }

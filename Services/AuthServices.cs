@@ -41,23 +41,24 @@ public class AuthServices(IOptionsMonitor<AppSetting> optionsMonitor, IMapper ma
         }
 
         var refreshToken = GenerateRefreshToken();
-        var accessToken = GenerateJwtToken(userExisting.Id);
+        var accessToken = GenerateJwtToken(userExisting.Id, userExisting.Role);
 
         return (accessToken, refreshToken, userExisting.Id);
     }
-    public string GenerateJwtToken(Guid userId)
+    public string GenerateJwtToken(Guid userId, UserRole role)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSetting.SecretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            new Claim(ClaimTypes.Role, role.ToString())
         };
 
         var token = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(7),
+            expires: DateTime.UtcNow.AddDays(7),
             signingCredentials: creds
         );
 
