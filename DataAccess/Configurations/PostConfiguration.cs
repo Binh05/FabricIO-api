@@ -33,6 +33,19 @@ public class PostCommentConfiguration : IEntityTypeConfiguration<PostComment>
     }
 }
 
+public class PostMediaConfiguration : IEntityTypeConfiguration<PostMedia>
+{
+    public void Configure(EntityTypeBuilder<PostMedia> builder)
+    {
+        builder.HasKey(m => m.Id);
+        builder.Property(m => m.Id).HasDefaultValueSql("gen_random_uuid()");
+        builder.HasOne(m => m.Post)
+            .WithMany(p => p.Media)
+            .HasForeignKey(m => m.PostId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
 public class PostReactionConfiguration : IEntityTypeConfiguration<PostReaction>
 {
     public void Configure(EntityTypeBuilder<PostReaction> builder)

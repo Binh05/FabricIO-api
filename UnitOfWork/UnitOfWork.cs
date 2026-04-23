@@ -24,6 +24,12 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
     private readonly IRepository<GameFavorite> gameFavorites = new Repository<GameFavorite>(mapper, ctx);
     public IRepository<GameFavorite> GameFavorites => gameFavorites;
 
+    private readonly IRepository<Post> posts = new Repository<Post>(mapper, ctx);
+    public IRepository<Post> Posts => posts;
+
+    private readonly IRepository<PostMedia> postMedias = new Repository<PostMedia>(mapper, ctx);
+    public IRepository<PostMedia> PostMedias => postMedias;
+
     private readonly IGameCommentRepository gameComments = new GameCommentRepository(mapper, ctx);
     public IGameCommentRepository GameComments => gameComments;
 
