@@ -69,6 +69,16 @@ public class UsersController(IUserService userService, IStorageService storageSe
 
         return Ok(data);
     }
+
+    [HttpPost("{userId}/gameban")]
+    public async Task<IActionResult> BanUploadGameAsync([FromRoute] Guid userId, CancellationToken token)
+    {
+        var role = User.GetRole();
+
+        var usernameBaned = await userService.BanUploadGame(userId, role, token);
+
+        return Ok(new { message = $"Đã ban người chơi {usernameBaned} upload game"});
+    }
     
     [HttpPatch("profile")]
     public async Task<ActionResult<UserResponse>> UpdateProfileAsync(UpdateUserDto req, CancellationToken token)

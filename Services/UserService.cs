@@ -114,4 +114,24 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
     {
         return await unitOfWork.Games.GetListAsync<GameCardDto>(g => g.OwnerId == userId, token);
     }
+
+    public async Task<string> BanUploadGame(Guid userId, UserRole adminRole, CancellationToken token)
+    {
+        if (adminRole != UserRole.Admin)
+        {
+            throw new ForbidException("Không có quyền cấm người chơi khác");
+        }
+
+        var user = await unitOfWork.Users.GetEntityAsync(u => u.Id == userId, token);
+        if (user == null)
+        {
+            throw new NotFoundException("User bị ban không tồn tại");
+        }
+
+        user.IsGameBanned = true;
+        unitOfWork.Users.Update(user);
+        await unitOfWork.SaveAsync(token);
+
+        return user.Username;
+    }
 }

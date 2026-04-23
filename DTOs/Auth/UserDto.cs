@@ -10,6 +10,10 @@ public class UserResponse
     public required string Email { get; set; }
     public required string Username { get; set; }
     public required string DisplayName { get; set; }
+    public bool IsBanned { get; set; }
+    public DateTime? BanExpiresAt { get; set; }
+    public bool IsPostBanned { get; set; }
+    public bool IsGameBanned { get; set; }
     public string? AvatarUrl { get; set; }
     public string? Bio { get; set; }
     public string Role { get; set; } = "user";
