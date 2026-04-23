@@ -6,7 +6,7 @@ using FabricIO_api.UnitOfWork;
 
 namespace FabricIO_api.Services;
 
-public class GameServices(IUnitOfWork unitOfWork, IMapper mapper, IStorageService storageService) : IGameServices
+public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService storageService) : IGameServices
 {
     private readonly string gameBucket = "game-assets";
     public async Task<GameResponseDto> GetByIdAsync(Guid gameId, CancellationToken token)

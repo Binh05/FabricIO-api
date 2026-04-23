@@ -71,7 +71,7 @@ builder.Services.AddMinio(configureClient => configureClient
 builder.Services.AddAutoMapper(config => {}, Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IGameServices, GameServices>();
+builder.Services.AddScoped<IGameServices, GameService>();
 builder.Services.AddScoped<IAuthServices, AuthServices>();
 builder.Services.AddScoped<ISessionServices, SessionService>();
 builder.Services.AddScoped<IStorageService, StorageServices>();
