@@ -15,6 +15,12 @@ public class GameServices(IUnitOfWork unitOfWork, IMapper mapper, IStorageServic
     }
     public async Task<GameResponseDto> CreateGameAsync(Guid userId, GameRequestDto gameReq, CancellationToken token)
     {
+        var user = await unitOfWork.Users.GetEntityAsync(u => u.Id != userId, token);
+        if (user == null || user.IsGameBanned)
+        {
+            throw new ForbidException("Không có quyền đăng tải game");
+        }
+
         var entity = mapper.Map<Game>(gameReq);
         entity.Id = Guid.NewGuid();
 
