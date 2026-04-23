@@ -26,6 +26,21 @@ public class PostController(IPostService postService) : ControllerBase
         return Ok(new { PostTotal = entities.Count(), posts = entities });
     }
 
+    [HttpGet("user/{userId}")]
+    public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetPostsByUserIdAsync([FromRoute] Guid userId, CancellationToken token)
+    {
+        var entities = await postService.GetPostsByUserIdAsync(userId, token);
+        return Ok(new { PostTotal = entities.Count(), posts = entities });
+    }
+
+    [HttpGet("user/me")]
+    public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetMyPostsAsync(CancellationToken token)
+    {
+        Guid userId = User.GetUserId();
+        var entities = await postService.GetPostsByUserIdAsync(userId, token);
+        return Ok(new { PostTotal = entities.Count(), posts = entities });
+    }
+
     [HttpPost]
     public async Task<ActionResult<PostResponseDto>> PostAsync([FromForm] PostRequestDto postReq, CancellationToken token)
     {

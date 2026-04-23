@@ -86,7 +86,7 @@ public class StorageServices(IMinioClient minioClient) : IStorageService
             token
         );
 
-        return $"localhost/{bucketName}/{key}";
+        return $"localhost:9000/{bucketName}/{key}";
     }
     public async Task DeleteFolderAsync(string bucketName, string prefix, CancellationToken token)
     {
