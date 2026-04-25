@@ -20,6 +20,14 @@ public class UsersController(IUserService userService, IStorageService storageSe
         return Ok(data);
     }
 
+    [HttpGet("{userId}")]
+    public async Task<ActionResult<UserResponse>> GetUserById([FromRoute] Guid userId, CancellationToken token)
+    {
+        var res = await userService.GetByIdAsync(userId, token);
+
+        return Ok(res);
+    }
+
     [HttpGet("me")]
     public async Task<ActionResult<UserResponse>> FetchMeAsync(CancellationToken token)
     {

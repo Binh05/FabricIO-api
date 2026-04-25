@@ -15,6 +15,7 @@ FabricIO is a backend service for a mini social network and digital distribution
 - **Framework:** ASP.NET Core Web API
 - **Language:** C#
 - **Database:** PostgreSQL
+- **Persistence:** Entity Framework Core
 - **Object Storage:** MinIO (Local) / AWS S3 (Production)
 - **Reverse Proxy:** Nginx
 - **Containerization:** Docker & Docker Compose
