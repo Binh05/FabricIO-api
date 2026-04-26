@@ -116,7 +116,11 @@ public class StorageServices(IMinioClient minioClient) : IStorageService
 
         if (!found)
         {
-            throw new NotFoundException("Storage không tồn tại");
+            //throw new NotFoundException("Storage không tồn tại");
+            await minioClient.MakeBucketAsync(
+                new MakeBucketArgs()
+                .WithBucket(bucket)
+                , token);
         }
     }
 
