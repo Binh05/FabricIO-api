@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using FabricIO_api.Enums;
 using Microsoft.AspNetCore.Http;
 
 namespace FabricIO_api.DTOs;
@@ -22,6 +23,8 @@ public class PostResponseDto
     public string Content { get; set; } = null!;
     public int LikeCount { get; set; }
     public int DislikeCount { get; set; }
+    public int CommentCount { get; set; }
+    public ReactionType? UserReaction { get; set; }
     public DateTime CreatedAt { get; set; }
     public UserDisplay? Author { get; set; }
     public IEnumerable<PostMediaDto> Media { get; set; } = [];

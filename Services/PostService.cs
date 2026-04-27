@@ -36,7 +36,7 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
     {
         var post = await unitOfWork.Posts.FindOneAsync<PostResponseDto>(p => p.Id == id, token);
         if (post == null)
-            throw new NotFoundException("Bài đăng không tồn tại");
+            throw new NotFoundException("Post not found");
 
         await PopulateAuthorAsync(post, token);
         return post;
@@ -64,10 +64,10 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
     {
         var post = await unitOfWork.Posts.GetEntityAsync(p => p.Id == id, token);
         if (post == null || post.IsDeleted)
-            throw new NotFoundException("Bài đăng không tồn tại");
+            throw new NotFoundException("Post not found");
 
         if (post.AuthorId != userId)
-            throw new UnauthorizedException("Bạn không có quyền sửa bài đăng này");                                                                          
+            throw new UnauthorizedException("You are not the owner of this post");
 
         post.Title = request.Title;
         post.Content = request.Content;
@@ -109,10 +109,10 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
     {
         var post = await unitOfWork.Posts.GetEntityAsync(p => p.Id == id, token);
         if (post == null || post.IsDeleted)
-            throw new NotFoundException("Bài đăng không tồn tại");
+            throw new NotFoundException("Post not found");
 
         if (post.AuthorId != userId)
-            throw new UnauthorizedException("Bạn không có quyền xóa bài đăng này");
+            throw new UnauthorizedException("You are not the owner of this post");
 
         post.IsDeleted = true;
         post.DeletedAt = DateTime.UtcNow;
