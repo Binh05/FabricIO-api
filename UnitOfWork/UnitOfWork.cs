@@ -30,6 +30,9 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
     private readonly IRepository<PostMedia> postMedias = new Repository<PostMedia>(mapper, ctx);
     public IRepository<PostMedia> PostMedias => postMedias;
 
+    private readonly IRepository<PostReaction> postReactions = new Repository<PostReaction>(mapper, ctx);
+    public IRepository<PostReaction> PostReactions => postReactions;
+
     private readonly IGameCommentRepository gameComments = new GameCommentRepository(mapper, ctx);
     public IGameCommentRepository GameComments => gameComments;
 

@@ -8,4 +8,5 @@ public interface IStorageService
     string GetContentType(string file);
     Task<string> DownloadFileAync(Guid fileId, CancellationToken token);
     Task DeleteFolderAsync(string bucketName, string prefix, CancellationToken token);
+    Task DeleteFileByUrlAsync(string mediaUrl, CancellationToken token);
 }

@@ -12,6 +12,7 @@ public interface IUnitOfWork
     public IRepository<GameFavorite> GameFavorites { get; }
     public IRepository<Post> Posts { get; }
     public IRepository<PostMedia> PostMedias { get; }
+    public IRepository<PostReaction> PostReactions { get; }
     public IGameCommentRepository GameComments { get; }
     public IGameRatingRepository GameRatings { get; }
     public IRepository<GamePurchase> GamePurchases { get; }

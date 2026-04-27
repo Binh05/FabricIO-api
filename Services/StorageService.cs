@@ -136,4 +136,24 @@ public class StorageServices(IMinioClient minioClient) : IStorageService
 
         return url;
     }
+
+    public async Task DeleteFileByUrlAsync(string mediaUrl, CancellationToken token)
+    {
+        var objectKey = ExtractObjectKey(mediaUrl);
+
+        Console.WriteLine($"Extracted object key: {objectKey}");
+        
+        await minioClient.RemoveObjectAsync(
+            new RemoveObjectArgs()
+                .WithBucket("file")
+                .WithObject(objectKey),
+            token);
+    }
+
+    private string ExtractObjectKey(string mediaUrl)
+    {
+        var uri = new Uri(mediaUrl);
+        return uri.AbsolutePath.TrimStart('/');
+    }
+
 }
