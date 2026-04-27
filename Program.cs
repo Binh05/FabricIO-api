@@ -79,6 +79,7 @@ builder.Services.AddScoped<IGameTagService, GameTagService>();
 builder.Services.AddScoped<IGameFavoriteService, GameFavoriteService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IPostReactionService, PostReactionService>();
+builder.Services.AddScoped<IPostCommentService, PostCommentService>();
 builder.Services.AddScoped<IGameCommentService, GameCommentService>();
 builder.Services.AddScoped<IGameRatingService, GameRatingService>();
 builder.Services.AddScoped<IGamePurchaseService, GamePurchaseService>();
