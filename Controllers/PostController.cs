@@ -34,6 +34,7 @@ public class PostController(IPostService postService) : ControllerBase
     }
 
     [HttpGet("user/me")]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetMyPostsAsync(CancellationToken token)
     {
         Guid userId = User.GetUserId();

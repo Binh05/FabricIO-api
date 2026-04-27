@@ -21,6 +21,7 @@ public class PostResponseDto
     public string Title { get; set; } = null!;
     public string Content { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
+    public UserDisplay? Author { get; set; }
     public IEnumerable<PostMediaDto> Media { get; set; } = [];
 }
 
