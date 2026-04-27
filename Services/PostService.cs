@@ -42,18 +42,22 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         return post;
     }
 
-    public async Task<IEnumerable<PostResponseDto>> GetPostsByUserIdAsync(Guid userId, CancellationToken token)
+    public async Task<PostPaginationResult> GetPostsByUserIdAsync(Guid userId, PaginationDto pagination, CancellationToken token)
     {
-        var posts = (await unitOfWork.Posts.GetListAsync<PostResponseDto>(p => p.AuthorId == userId && !p.IsDeleted, token)).ToList();
+        var posts = (await unitOfWork.Posts.GetListAsync<PostResponseDto>(p => p.AuthorId == userId && !p.IsDeleted, token))
+            .OrderByDescending(p => p.CreatedAt)
+            .ToList();
         await PopulateAuthorsAsync(posts, token);
-        return posts;
+        return BuildPaginationResult(posts, pagination);
     }
 
-    public async Task<IEnumerable<PostResponseDto>> GetPostsAsync(CancellationToken token)
+    public async Task<PostPaginationResult> GetPostsAsync(PaginationDto pagination, CancellationToken token)
     {
-        var posts = (await unitOfWork.Posts.GetListAsync<PostResponseDto>(p => !p.IsDeleted, token)).ToList();
+        var posts = (await unitOfWork.Posts.GetListAsync<PostResponseDto>(p => !p.IsDeleted, token))
+            .OrderByDescending(p => p.CreatedAt)
+            .ToList();
         await PopulateAuthorsAsync(posts, token);
-        return posts;
+        return BuildPaginationResult(posts, pagination);
     }
 
     public async Task<PostResponseDto> UpdatePostAsync(Guid userId, Guid id, UpdatePostRequestDto request, CancellationToken token)
@@ -130,12 +134,33 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
 
         var authorIds = posts.Select(p => p.AuthorId).Distinct().ToList();
         var authors = await unitOfWork.Users.GetListAsync<UserDisplay>(u => authorIds.Contains(u.Id), token);
-        var authorMap = authors.ToDictionary(a => a.Id);
+        var normalizedAuthorMap = authors
+            .Where(a => a.Id.HasValue)
+            .ToDictionary(a => a.Id!.Value);
 
         foreach (var post in posts)
         {
-            if (authorMap.TryGetValue(post.AuthorId, out var author))
+            if (normalizedAuthorMap.TryGetValue(post.AuthorId, out var author))
                 post.Author = author;
         }
+    }
+
+    private static PostPaginationResult BuildPaginationResult(List<PostResponseDto> posts, PaginationDto pagination)
+    {
+        var page = pagination.Page < 1 ? 1 : pagination.Page;
+        var pageSize = pagination.PageSize < 1 ? 20 : pagination.PageSize;
+
+        var items = posts
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return new PostPaginationResult
+        {
+            Total = posts.Count,
+            Page = page,
+            PageSize = pageSize,
+            Items = items
+        };
     }
 }

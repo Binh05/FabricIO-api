@@ -20,26 +20,26 @@ public class PostController(IPostService postService) : ControllerBase
 
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetPostsAsync(CancellationToken token)
+    public async Task<ActionResult<PostPaginationResult>> GetPostsAsync([FromQuery] PaginationDto pagination, CancellationToken token)
     {
-        var entities = await postService.GetPostsAsync(token);
-        return Ok(new { PostTotal = entities.Count(), posts = entities });
+        var entities = await postService.GetPostsAsync(pagination, token);
+        return Ok(entities);
     }
 
     [HttpGet("user/{userId}")]
-    public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetPostsByUserIdAsync([FromRoute] Guid userId, CancellationToken token)
+    public async Task<ActionResult<PostPaginationResult>> GetPostsByUserIdAsync([FromRoute] Guid userId, [FromQuery] PaginationDto pagination, CancellationToken token)
     {
-        var entities = await postService.GetPostsByUserIdAsync(userId, token);
-        return Ok(new { PostTotal = entities.Count(), posts = entities });
+        var entities = await postService.GetPostsByUserIdAsync(userId, pagination, token);
+        return Ok(entities);
     }
 
     [HttpGet("user/me")]
     [Authorize]
-    public async Task<ActionResult<IEnumerable<PostResponseDto>>> GetMyPostsAsync(CancellationToken token)
+    public async Task<ActionResult<PostPaginationResult>> GetMyPostsAsync([FromQuery] PaginationDto pagination, CancellationToken token)
     {
         Guid userId = User.GetUserId();
-        var entities = await postService.GetPostsByUserIdAsync(userId, token);
-        return Ok(new { PostTotal = entities.Count(), posts = entities });
+        var entities = await postService.GetPostsByUserIdAsync(userId, pagination, token);
+        return Ok(entities);
     }
 
     [HttpPost]

@@ -31,6 +31,12 @@ public class PostMediaDto
     public string MediaUrl { get; set; } = null!;
 }
 
+public class PostPaginationResult : PaginationDto
+{
+    public int Total { get; set; }
+    public IEnumerable<PostResponseDto> Items { get; set; } = [];
+}
+
 public class UpdatePostRequestDto
 {
     [Required]
