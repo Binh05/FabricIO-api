@@ -1,3 +1,4 @@
+using FabricIO_api.Enums;
 namespace FabricIO_api.Entities;
 
 public class Post
@@ -10,6 +11,8 @@ public class Post
     public DateTime? DeletedAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public int LikeCount { get; set; } = 0;
+    public int DislikeCount { get; set; } = 0;
 
     //
     public User Author { get; set; } = null!;
@@ -52,10 +55,4 @@ public class PostReaction
 
     public User User { get; set; } = null!;
     public Post Post { get; set; } = null!;
-}
-
-public enum ReactionType
-{
-    Like,
-    Dislike
 }

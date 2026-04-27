@@ -20,6 +20,8 @@ public class PostResponseDto
     public Guid AuthorId { get; set; }
     public string Title { get; set; } = null!;
     public string Content { get; set; } = null!;
+    public int LikeCount { get; set; }
+    public int DislikeCount { get; set; }
     public DateTime CreatedAt { get; set; }
     public UserDisplay? Author { get; set; }
     public IEnumerable<PostMediaDto> Media { get; set; } = [];
