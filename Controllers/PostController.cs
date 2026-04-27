@@ -51,7 +51,7 @@ public class PostController(IPostService postService) : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<PostResponseDto>> PutAsync([FromRoute] Guid id, [FromForm] PostRequestDto postReq, CancellationToken token)
+    public async Task<ActionResult<PostResponseDto>> PutAsync([FromRoute] Guid id, [FromForm] UpdatePostRequestDto postReq, CancellationToken token)
     {
         Guid userId = User.GetUserId();
         var response = await postService.UpdatePostAsync(userId, id, postReq, token);

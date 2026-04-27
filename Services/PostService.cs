@@ -56,22 +56,35 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         return posts;
     }
 
-    public async Task<PostResponseDto> UpdatePostAsync(Guid userId, Guid id, PostRequestDto request, CancellationToken token)
+    public async Task<PostResponseDto> UpdatePostAsync(Guid userId, Guid id, UpdatePostRequestDto request, CancellationToken token)
     {
         var post = await unitOfWork.Posts.GetEntityAsync(p => p.Id == id, token);
         if (post == null || post.IsDeleted)
             throw new NotFoundException("Bài đăng không tồn tại");
 
         if (post.AuthorId != userId)
-            throw new UnauthorizedException("Bạn không có quyền sửa bài đăng này");
+            throw new UnauthorizedException("Bạn không có quyền sửa bài đăng này");                                                                          
 
         post.Title = request.Title;
         post.Content = request.Content;
         post.UpdatedAt = DateTime.UtcNow;
-
-        if (request.MediaFiles != null && request.MediaFiles.Any())
+        
+        if (request.DeletedImageIds != null && request.DeletedImageIds.Any())
         {
-            foreach (var file in request.MediaFiles)
+            foreach (var imageId in request.DeletedImageIds)
+            {
+                var media = unitOfWork.PostMedias.GetEntityAsync(m => m.Id == imageId, token).Result;
+                if (media != null)
+                {
+                    await storageService.DeleteFileByUrlAsync(media.MediaUrl, token); 
+                    unitOfWork.PostMedias.Delete(media);
+                }
+            }
+        }
+
+        if (request.NewImages != null && request.NewImages.Any())
+        {
+            foreach (var file in request.NewImages)
             {
                 var mediaUrl = await storageService.UploadFileAsync(file, "file", "post/" + post.Id + "/" + file.FileName, token);
                 post.Media.Add(new PostMedia

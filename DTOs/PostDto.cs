@@ -30,3 +30,15 @@ public class PostMediaDto
     public Guid Id { get; set; }
     public string MediaUrl { get; set; } = null!;
 }
+
+public class UpdatePostRequestDto
+{
+    [Required]
+    public string Title { get; set; } = null!;
+    
+    [Required]
+    public string Content { get; set; } = null!;
+    
+    public List<Guid>? DeletedImageIds { get; set; }
+    public List<IFormFile>? NewImages { get; set; }
+}
