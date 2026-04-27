@@ -14,7 +14,8 @@ public class PostController(IPostService postService) : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<PostResponseDto>> GetByIdAsync([FromRoute] Guid id, CancellationToken token)
     {
-        var response = await postService.GetPostByIdAsync(id, token);
+        var currentUserId = User.TryGetUserId();
+        var response = await postService.GetPostByIdAsync(id, currentUserId, token);
         return Ok(response);
     }
 
@@ -22,14 +23,16 @@ public class PostController(IPostService postService) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<PostPaginationResult>> GetPostsAsync([FromQuery] PaginationDto pagination, CancellationToken token)
     {
-        var entities = await postService.GetPostsAsync(pagination, token);
+        var currentUserId = User.TryGetUserId();
+        var entities = await postService.GetPostsAsync(pagination, currentUserId, token);
         return Ok(entities);
     }
 
     [HttpGet("user/{userId}")]
     public async Task<ActionResult<PostPaginationResult>> GetPostsByUserIdAsync([FromRoute] Guid userId, [FromQuery] PaginationDto pagination, CancellationToken token)
     {
-        var entities = await postService.GetPostsByUserIdAsync(userId, pagination, token);
+        var currentUserId = User.TryGetUserId();
+        var entities = await postService.GetPostsByUserIdAsync(userId, pagination, currentUserId, token);
         return Ok(entities);
     }
 
@@ -38,7 +41,7 @@ public class PostController(IPostService postService) : ControllerBase
     public async Task<ActionResult<PostPaginationResult>> GetMyPostsAsync([FromQuery] PaginationDto pagination, CancellationToken token)
     {
         Guid userId = User.GetUserId();
-        var entities = await postService.GetPostsByUserIdAsync(userId, pagination, token);
+        var entities = await postService.GetPostsByUserIdAsync(userId, pagination, userId, token);
         return Ok(entities);
     }
 

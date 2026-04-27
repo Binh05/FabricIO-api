@@ -24,7 +24,7 @@ public class PostResponseDto
     public int LikeCount { get; set; }
     public int DislikeCount { get; set; }
     public int CommentCount { get; set; }
-    public ReactionType? UserReaction { get; set; }
+    public ReactionType? MyReaction { get; set; }
     public DateTime CreatedAt { get; set; }
     public UserDisplay? Author { get; set; }
     public IEnumerable<PostMediaDto> Media { get; set; } = [];
