@@ -76,6 +76,21 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         return BuildPaginationResult(posts, pagination);
     }
 
+    public async Task<PostPaginationResult> GetTrendingPostsAsync(PaginationDto pagination, Guid? currentUserId, CancellationToken token)
+    {
+        var posts = (await unitOfWork.Posts.GetListAsync<PostResponseDto>(p => !p.IsDeleted, token))
+            .OrderByDescending(p => p.LikeCount + p.CommentCount)
+            .ThenByDescending(p => p.CreatedAt)
+            .ToList();
+
+        await PopulateAuthorsAsync(posts, token);
+        if (currentUserId.HasValue)
+        {
+            await PopulateUserReactionsAsync(posts, currentUserId.Value, token);
+        }
+        return BuildPaginationResult(posts, pagination);
+    }
+
     public async Task<PostResponseDto> UpdatePostAsync(Guid userId, Guid id, UpdatePostRequestDto request, CancellationToken token)
     {
         var post = await unitOfWork.Posts.GetEntityAsync(p => p.Id == id, token);
