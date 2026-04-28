@@ -13,7 +13,7 @@ public class Post
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     public int LikeCount { get; set; } = 0;
     public int DislikeCount { get; set; } = 0;
-
+    public int CommentCount { get; set; } = 0;
     //
     public User Author { get; set; } = null!;
     public ICollection<PostComment> Comments { get; set; } = new List<PostComment>();

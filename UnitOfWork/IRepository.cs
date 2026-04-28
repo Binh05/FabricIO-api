@@ -5,6 +5,7 @@ namespace FabricIO_api.UnitOfWork;
 public interface IRepository<T>
 {
     Task<T?> GetEntityAsync(Expression<Func<T, bool>> predicate, CancellationToken token);
+    Task<IEnumerable<T>> GetEntitiesAsync(Expression<Func<T, bool>> predicate, CancellationToken token);
     Task<TOut> GetByIdAsync<TOut>(Guid id, CancellationToken token);
     Task<TOut?> FindOneAsync<TOut>(Expression<Func<T, bool>> predicate, CancellationToken token);
     Task<IEnumerable<TOut>> GetAllAsync<TOut>(CancellationToken token);

@@ -46,13 +46,18 @@ The project uses Docker Compose to easily provision the required infrastructure 
     docker-compose up -d
     ```
     _This command will spin up PostgreSQL, MinIO, and Nginx in the background._
-3.  **Run the API:**
+3.  **Update database:**
+    Open the project in Visual Studio or use the .NET CLI:
+    ```bash
+    dotnet ef database update
+    ```
+4.  **Run the API:**
     Open the project in Visual Studio or use the .NET CLI:
     ```bash
     dotnet restore
     dotnet run
     ```
-4.  **Explore the API:**
+5.  **Explore the API:**
     Once the application is running, open your web browser and navigate to the Swagger UI to test the endpoints.
     ```bash
     https://localhost:7100/swagger/index.html

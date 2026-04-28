@@ -29,34 +29,50 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         await unitOfWork.SaveAsync(token);
 
         var result = await unitOfWork.Posts.FindOneAsync<PostResponseDto>(p => p.Id == post.Id, token);
+        if (result != null)
+        {
+            result.MyReaction = null; // No reaction on a newly created post
+        }
         return result!;
     }
 
-    public async Task<PostResponseDto> GetPostByIdAsync(Guid id, CancellationToken token)
+    public async Task<PostResponseDto> GetPostByIdAsync(Guid id, Guid? currentUserId, CancellationToken token)
     {
         var post = await unitOfWork.Posts.FindOneAsync<PostResponseDto>(p => p.Id == id, token);
         if (post == null)
-            throw new NotFoundException("Bài đăng không tồn tại");
+            throw new NotFoundException("Post not found");
 
         await PopulateAuthorAsync(post, token);
+        if (currentUserId.HasValue)
+        {
+            await PopulateUserReactionsAsync(new List<PostResponseDto> { post }, currentUserId.Value, token);
+        }
         return post;
     }
 
-    public async Task<PostPaginationResult> GetPostsByUserIdAsync(Guid userId, PaginationDto pagination, CancellationToken token)
+    public async Task<PostPaginationResult> GetPostsByUserIdAsync(Guid userId, PaginationDto pagination, Guid? currentUserId, CancellationToken token)
     {
         var posts = (await unitOfWork.Posts.GetListAsync<PostResponseDto>(p => p.AuthorId == userId && !p.IsDeleted, token))
             .OrderByDescending(p => p.CreatedAt)
             .ToList();
         await PopulateAuthorsAsync(posts, token);
+        if (currentUserId.HasValue)
+        {
+            await PopulateUserReactionsAsync(posts, currentUserId.Value, token);
+        }
         return BuildPaginationResult(posts, pagination);
     }
 
-    public async Task<PostPaginationResult> GetPostsAsync(PaginationDto pagination, CancellationToken token)
+    public async Task<PostPaginationResult> GetPostsAsync(PaginationDto pagination, Guid? currentUserId, CancellationToken token)
     {
         var posts = (await unitOfWork.Posts.GetListAsync<PostResponseDto>(p => !p.IsDeleted, token))
             .OrderByDescending(p => p.CreatedAt)
             .ToList();
         await PopulateAuthorsAsync(posts, token);
+        if (currentUserId.HasValue)
+        {
+            await PopulateUserReactionsAsync(posts, currentUserId.Value, token);
+        }
         return BuildPaginationResult(posts, pagination);
     }
 
@@ -64,10 +80,10 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
     {
         var post = await unitOfWork.Posts.GetEntityAsync(p => p.Id == id, token);
         if (post == null || post.IsDeleted)
-            throw new NotFoundException("Bài đăng không tồn tại");
+            throw new NotFoundException("Post not found");
 
         if (post.AuthorId != userId)
-            throw new UnauthorizedException("Bạn không có quyền sửa bài đăng này");                                                                          
+            throw new UnauthorizedException("You are not the owner of this post");
 
         post.Title = request.Title;
         post.Content = request.Content;
@@ -109,10 +125,10 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
     {
         var post = await unitOfWork.Posts.GetEntityAsync(p => p.Id == id, token);
         if (post == null || post.IsDeleted)
-            throw new NotFoundException("Bài đăng không tồn tại");
+            throw new NotFoundException("Post not found");
 
         if (post.AuthorId != userId)
-            throw new UnauthorizedException("Bạn không có quyền xóa bài đăng này");
+            throw new UnauthorizedException("You are not the owner of this post");
 
         post.IsDeleted = true;
         post.DeletedAt = DateTime.UtcNow;
@@ -142,6 +158,22 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         {
             if (normalizedAuthorMap.TryGetValue(post.AuthorId, out var author))
                 post.Author = author;
+        }
+    }
+
+    private async Task PopulateUserReactionsAsync(List<PostResponseDto> posts, Guid userId, CancellationToken token)
+    {
+        if (!posts.Any())
+            return;
+
+        var postIds = posts.Select(p => p.Id).ToList();
+        var reactions = await unitOfWork.PostReactions.GetEntitiesAsync(r => postIds.Contains(r.PostId) && r.UserId == userId, token);
+        var reactionMap = reactions.ToDictionary(r => r.PostId, r => r.ReactionType);
+
+        foreach (var post in posts)
+        {
+            if (reactionMap.TryGetValue(post.Id, out var reaction))
+                post.MyReaction = reaction;
         }
     }
 

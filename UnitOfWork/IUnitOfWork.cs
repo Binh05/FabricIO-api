@@ -11,6 +11,7 @@ public interface IUnitOfWork
     public IRepository<GameTagMap> GameTagMaps { get; }
     public IRepository<GameFavorite> GameFavorites { get; }
     public IRepository<Post> Posts { get; }
+    public IRepository<PostComment> PostComments { get; }
     public IRepository<PostMedia> PostMedias { get; }
     public IRepository<PostReaction> PostReactions { get; }
     public IGameCommentRepository GameComments { get; }

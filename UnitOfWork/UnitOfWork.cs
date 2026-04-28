@@ -27,6 +27,9 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
     private readonly IRepository<Post> posts = new Repository<Post>(mapper, ctx);
     public IRepository<Post> Posts => posts;
 
+    private readonly IRepository<PostComment> postComments = new Repository<PostComment>(mapper, ctx);
+    public IRepository<PostComment> PostComments => postComments;
+
     private readonly IRepository<PostMedia> postMedias = new Repository<PostMedia>(mapper, ctx);
     public IRepository<PostMedia> PostMedias => postMedias;
 
