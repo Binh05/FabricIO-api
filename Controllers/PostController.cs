@@ -28,6 +28,15 @@ public class PostController(IPostService postService) : ControllerBase
         return Ok(entities);
     }
 
+    [AllowAnonymous]
+    [HttpGet("trending")]
+    public async Task<ActionResult<PostPaginationResult>> GetTrendingPostsAsync([FromQuery] PaginationDto pagination, CancellationToken token)
+    {
+        var currentUserId = User.TryGetUserId();
+        var entities = await postService.GetTrendingPostsAsync(pagination, currentUserId, token);
+        return Ok(entities);
+    }
+
     [HttpGet("user/{userId}")]
     public async Task<ActionResult<PostPaginationResult>> GetPostsByUserIdAsync([FromRoute] Guid userId, [FromQuery] PaginationDto pagination, CancellationToken token)
     {
