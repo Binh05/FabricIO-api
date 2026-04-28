@@ -77,4 +77,12 @@ public class PostController(IPostService postService) : ControllerBase
         await postService.DeletePostAsync(userId, id, token);
         return NoContent();
     }
+
+    [HttpDelete("admin/{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> DeleteByAdminAsync([FromRoute] Guid id, CancellationToken token)
+    {
+        await postService.DeletePostByAdminAsync(id, token);
+        return NoContent();
+    }
 }

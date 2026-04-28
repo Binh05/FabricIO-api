@@ -152,6 +152,19 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         await unitOfWork.SaveAsync(token);
     }
 
+    public async Task DeletePostByAdminAsync(Guid id, CancellationToken token)
+    {
+        var post = await unitOfWork.Posts.GetEntityAsync(p => p.Id == id, token);
+        if (post == null || post.IsDeleted)
+            throw new NotFoundException("Post not found");
+
+        post.IsDeleted = true;
+        post.DeletedAt = DateTime.UtcNow;
+
+        unitOfWork.Posts.Update(post);
+        await unitOfWork.SaveAsync(token);
+    }
+
     private async Task PopulateAuthorAsync(PostResponseDto post, CancellationToken token)
     {
         var author = await unitOfWork.Users.FindOneAsync<UserDisplay>(u => u.Id == post.AuthorId, token);

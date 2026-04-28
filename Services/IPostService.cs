@@ -11,4 +11,5 @@ public interface IPostService
     Task<PostPaginationResult> GetTrendingPostsAsync(PaginationDto pagination, Guid? currentUserId, CancellationToken token);
     Task<PostResponseDto> UpdatePostAsync(Guid userId, Guid id, UpdatePostRequestDto request, CancellationToken token);
     Task DeletePostAsync(Guid userId, Guid id, CancellationToken token);
+    Task DeletePostByAdminAsync(Guid id, CancellationToken token);
 }
