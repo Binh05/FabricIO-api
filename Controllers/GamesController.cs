@@ -38,10 +38,34 @@ public class GamesController(IGameServices gameServices) : ControllerBase
     }
 
     [AllowAnonymous]
+    [HttpGet("featuredGame")]
+    public async Task<ActionResult<FeaturedGameResponse>> GetGamePlayHighestAsync(CancellationToken token)
+    {
+        var entity = await gameServices.GetGamePlayHighestAsync(token);
+
+        if (entity == null)
+        {
+            return NotFound(new { message = "Chưa có game nào được chơi" });
+        }
+
+        return Ok(entity);
+    }
+
+    [AllowAnonymous]
+    [HttpGet("topRatingGames")]
+    public async Task<ActionResult<IEnumerable<FeaturedGameRatingResponse>>> GetTopRatingGamesAsync([FromQuery] FeaturedGameRatingRequest req, CancellationToken token)
+    {
+        var result = await gameServices.GetTopRatingGamesAsync(req.Top, token);
+
+        return Ok(result);
+    }
+
     [HttpGet("{gameId}/play")]
     public async Task<ActionResult<GamePlayResponseDto>> GetGameUrlAsync([FromRoute] Guid gameId, CancellationToken token)
     {
-        var url = await gameServices.GetPlayUrlAsync(gameId, token);
+        var userId = User.GetUserId();
+
+        var url = await gameServices.GetPlayUrlAsync(userId, gameId, token);
 
         return Ok(new { GameUrl = url });
     }

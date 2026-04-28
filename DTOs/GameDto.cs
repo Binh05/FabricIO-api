@@ -47,3 +47,22 @@ public class GamePlayResponseDto
 {
     public string GameUrl { get; set; } = null!;
 }
+
+public class FeaturedGameResponse
+{
+    public int TotalPlay { get; set; }
+    public required GameResponseDto Game { get; set; }
+}
+
+public class FeaturedGameRatingResponse 
+{
+    public double AverageRating { get; set; }
+    public int TotalRating { get; set; }
+    public required GameResponseDto Game { get; set; }
+}
+
+public class FeaturedGameRatingRequest
+{
+    [Range(1, 100, ErrorMessage = "Top phải nằm trong khoảng từ 1 đến 100")]
+    public int Top { get; set; } = 6;
+}

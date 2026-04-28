@@ -182,7 +182,7 @@ namespace FabricIO_api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GameLogs");
+                    b.ToTable("GamePlay");
                 });
 
             modelBuilder.Entity("FabricIO_api.Entities.GamePurchase", b =>

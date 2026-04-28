@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FabricIO_api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260413111857_InitGameLog")]
-    partial class InitGameLog
+    [Migration("20260428172035_InitTables")]
+    partial class InitTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,7 @@ namespace FabricIO_api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("BlockerId", "BlockedId");
 
@@ -52,7 +52,7 @@ namespace FabricIO_api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("FollowerId", "FollowingId");
 
@@ -69,15 +69,12 @@ namespace FabricIO_api.Migrations
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("GameKey")
                         .HasColumnType("text");
 
                     b.Property<string>("GameType")
@@ -104,7 +101,7 @@ namespace FabricIO_api.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -125,13 +122,16 @@ namespace FabricIO_api.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("GameId")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -154,7 +154,7 @@ namespace FabricIO_api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("GameId", "UserId");
 
@@ -174,7 +174,7 @@ namespace FabricIO_api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("PlayedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -185,7 +185,7 @@ namespace FabricIO_api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("GameLogs");
+                    b.ToTable("GamePlay");
                 });
 
             modelBuilder.Entity("FabricIO_api.Entities.GamePurchase", b =>
@@ -205,9 +205,11 @@ namespace FabricIO_api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("PurchasedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BuyerId");
 
                     b.HasIndex("GameId");
 
@@ -222,7 +224,7 @@ namespace FabricIO_api.Migrations
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("GameId")
                         .HasColumnType("uuid");
@@ -288,7 +290,7 @@ namespace FabricIO_api.Migrations
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("boolean");
@@ -332,25 +334,34 @@ namespace FabricIO_api.Migrations
                     b.Property<Guid>("AuthorId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("CommentCount")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DislikeCount")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("LikeCount")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -371,7 +382,7 @@ namespace FabricIO_api.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -391,6 +402,30 @@ namespace FabricIO_api.Migrations
                     b.ToTable("PostComments");
                 });
 
+            modelBuilder.Entity("FabricIO_api.Entities.PostMedia", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("MediaUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("PostMedias");
+                });
+
             modelBuilder.Entity("FabricIO_api.Entities.PostReaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -399,7 +434,7 @@ namespace FabricIO_api.Migrations
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("PostId")
                         .HasColumnType("uuid");
@@ -421,6 +456,42 @@ namespace FabricIO_api.Migrations
                     b.ToTable("PostReactions");
                 });
 
+            modelBuilder.Entity("FabricIO_api.Entities.Session", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsReVoked")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Sessions");
+                });
+
             modelBuilder.Entity("FabricIO_api.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -435,13 +506,13 @@ namespace FabricIO_api.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("BanExpiresAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Bio")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
@@ -469,7 +540,7 @@ namespace FabricIO_api.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp without time zone");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -594,15 +665,15 @@ namespace FabricIO_api.Migrations
 
             modelBuilder.Entity("FabricIO_api.Entities.GamePurchase", b =>
                 {
-                    b.HasOne("FabricIO_api.Entities.Game", "Game")
+                    b.HasOne("FabricIO_api.Entities.User", "Buyer")
                         .WithMany("GamePurchases")
-                        .HasForeignKey("GameId")
+                        .HasForeignKey("BuyerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FabricIO_api.Entities.User", "Buyer")
+                    b.HasOne("FabricIO_api.Entities.Game", "Game")
                         .WithMany("GamePurchases")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -697,6 +768,17 @@ namespace FabricIO_api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("FabricIO_api.Entities.PostMedia", b =>
+                {
+                    b.HasOne("FabricIO_api.Entities.Post", "Post")
+                        .WithMany("Media")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
             modelBuilder.Entity("FabricIO_api.Entities.PostReaction", b =>
                 {
                     b.HasOne("FabricIO_api.Entities.Post", "Post")
@@ -712,6 +794,17 @@ namespace FabricIO_api.Migrations
                         .IsRequired();
 
                     b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FabricIO_api.Entities.Session", b =>
+                {
+                    b.HasOne("FabricIO_api.Entities.User", "User")
+                        .WithMany("Sessions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -739,6 +832,8 @@ namespace FabricIO_api.Migrations
             modelBuilder.Entity("FabricIO_api.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Media");
 
                     b.Navigation("Reactions");
                 });
@@ -772,6 +867,8 @@ namespace FabricIO_api.Migrations
                     b.Navigation("PostReactions");
 
                     b.Navigation("Posts");
+
+                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }

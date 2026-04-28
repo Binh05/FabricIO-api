@@ -67,12 +67,21 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         return result!;
     }
 
-    public async Task<string> GetPlayUrlAsync(Guid gameId, CancellationToken token)
+    public async Task<string> GetPlayUrlAsync(Guid userId, Guid gameId, CancellationToken token)
     {
         var game = await unitOfWork.Games.GetEntityAsync(g => g.Id == gameId, token);
 
         if (game == null || game.GameType != GameType.Browser)
             throw new Exception("Game không hỗ trợ play");
+
+        var gamePlay = new GamePlay
+        {
+            UserId = userId,
+            GameId = gameId
+        };
+
+        unitOfWork.GamePlays.Insert(gamePlay);
+        await unitOfWork.SaveAsync(token);
 
         return game.GameUrl!;
     }
@@ -125,5 +134,19 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         var url = await storageService.DownloadFileAync(gameId, token);
 
         return new GameDownloadDto { DownloadUrl = url };
+    }
+
+    public async Task<FeaturedGameResponse?> GetGamePlayHighestAsync(CancellationToken token)
+    {
+        var entity = await unitOfWork.GamePlays.GetFeaturedGameAsync(token);
+
+        return entity;
+    }
+
+    public async Task<IEnumerable<FeaturedGameRatingResponse>> GetTopRatingGamesAsync(int top, CancellationToken token)
+    {
+        var result = await unitOfWork.GameRatings.GetTopRatingGamesAsync(top, token);
+
+        return result;
     }
 }

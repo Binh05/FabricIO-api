@@ -8,6 +8,7 @@ public class GameLogConfiguration : IEntityTypeConfiguration<GamePlay>
 {
     public void Configure(EntityTypeBuilder<GamePlay> builder)
     {
+        builder.ToTable("GamePlay");
         builder.HasKey(l => l.Id);
         builder.Property(l => l.Id).HasDefaultValueSql("gen_random_uuid()");
         builder.HasOne(l => l.User)

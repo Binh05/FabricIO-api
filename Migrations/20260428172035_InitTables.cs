@@ -36,12 +36,12 @@ namespace FabricIO_api.Migrations
                     AvatarUrl = table.Column<string>(type: "text", nullable: true),
                     Role = table.Column<string>(type: "text", nullable: false),
                     IsBanned = table.Column<bool>(type: "boolean", nullable: false),
-                    BanExpiresAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
+                    BanExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsPostBanned = table.Column<bool>(type: "boolean", nullable: false),
                     IsGameBanned = table.Column<bool>(type: "boolean", nullable: false),
                     Balance = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -54,7 +54,7 @@ namespace FabricIO_api.Migrations
                 {
                     BlockerId = table.Column<Guid>(type: "uuid", nullable: false),
                     BlockedId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -79,7 +79,7 @@ namespace FabricIO_api.Migrations
                 {
                     FollowerId = table.Column<Guid>(type: "uuid", nullable: false),
                     FollowingId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -109,12 +109,11 @@ namespace FabricIO_api.Migrations
                     ThumbnailUrl = table.Column<string>(type: "text", nullable: true),
                     GameType = table.Column<string>(type: "text", nullable: false),
                     GameUrl = table.Column<string>(type: "text", nullable: true),
-                    GameKey = table.Column<string>(type: "text", nullable: true),
                     Price = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -139,7 +138,7 @@ namespace FabricIO_api.Migrations
                     ReferenceId = table.Column<Guid>(type: "uuid", nullable: true),
                     ReferenceType = table.Column<string>(type: "text", nullable: true),
                     IsRead = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -167,9 +166,12 @@ namespace FabricIO_api.Migrations
                     Title = table.Column<string>(type: "text", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    DeletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LikeCount = table.Column<int>(type: "integer", nullable: false),
+                    DislikeCount = table.Column<int>(type: "integer", nullable: false),
+                    CommentCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -183,6 +185,29 @@ namespace FabricIO_api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Sessions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    IsReVoked = table.Column<bool>(type: "boolean", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Sessions_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GameComments",
                 columns: table => new
                 {
@@ -191,7 +216,8 @@ namespace FabricIO_api.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -216,7 +242,7 @@ namespace FabricIO_api.Migrations
                 {
                     GameId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -236,6 +262,32 @@ namespace FabricIO_api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GamePlay",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GameId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PlayedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GamePlay", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GamePlay_Games_GameId",
+                        column: x => x.GameId,
+                        principalTable: "Games",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GamePlay_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GamePurchases",
                 columns: table => new
                 {
@@ -243,7 +295,7 @@ namespace FabricIO_api.Migrations
                     GameId = table.Column<Guid>(type: "uuid", nullable: false),
                     BuyerId = table.Column<Guid>(type: "uuid", nullable: false),
                     AmountPaid = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
-                    PurchasedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    PurchasedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -255,8 +307,8 @@ namespace FabricIO_api.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GamePurchases_Users_Id",
-                        column: x => x.Id,
+                        name: "FK_GamePurchases_Users_BuyerId",
+                        column: x => x.BuyerId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -270,7 +322,7 @@ namespace FabricIO_api.Migrations
                     GameId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Stars = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -323,7 +375,7 @@ namespace FabricIO_api.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Content = table.Column<string>(type: "text", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -343,6 +395,26 @@ namespace FabricIO_api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PostMedias",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    PostId = table.Column<Guid>(type: "uuid", nullable: false),
+                    MediaUrl = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PostMedias", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PostMedias_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PostReactions",
                 columns: table => new
                 {
@@ -350,7 +422,7 @@ namespace FabricIO_api.Migrations
                     PostId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ReactionType = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -393,6 +465,21 @@ namespace FabricIO_api.Migrations
                 name: "IX_GameFavorites_UserId",
                 table: "GameFavorites",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GamePlay_GameId",
+                table: "GamePlay",
+                column: "GameId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GamePlay_UserId",
+                table: "GamePlay",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GamePurchases_BuyerId",
+                table: "GamePurchases",
+                column: "BuyerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_GamePurchases_GameId",
@@ -447,6 +534,11 @@ namespace FabricIO_api.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PostMedias_PostId",
+                table: "PostMedias",
+                column: "PostId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PostReactions_PostId_UserId",
                 table: "PostReactions",
                 columns: new[] { "PostId", "UserId" },
@@ -461,6 +553,17 @@ namespace FabricIO_api.Migrations
                 name: "IX_Posts_AuthorId",
                 table: "Posts",
                 column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_Token",
+                table: "Sessions",
+                column: "Token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_UserId",
+                table: "Sessions",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
@@ -491,6 +594,9 @@ namespace FabricIO_api.Migrations
                 name: "GameFavorites");
 
             migrationBuilder.DropTable(
+                name: "GamePlay");
+
+            migrationBuilder.DropTable(
                 name: "GamePurchases");
 
             migrationBuilder.DropTable(
@@ -506,7 +612,13 @@ namespace FabricIO_api.Migrations
                 name: "PostComments");
 
             migrationBuilder.DropTable(
+                name: "PostMedias");
+
+            migrationBuilder.DropTable(
                 name: "PostReactions");
+
+            migrationBuilder.DropTable(
+                name: "Sessions");
 
             migrationBuilder.DropTable(
                 name: "GameTags");
