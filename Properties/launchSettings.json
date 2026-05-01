@@ -11,7 +11,8 @@
         "ASPNETCORE_CONNECTION": "Host=localhost;Port=5432;Database=Dotnet;Username=postgres;Password=123456",
         "ASPNETCORE_MINIO_ACCESSKEY": "admin",
         "ASPNETCORE_MINIO_SECRETKEY": "password123",
-        "ASPNETCORE_MINIO_ENDPOINT": "localhost:9000"
+        "ASPNETCORE_MINIO_ENDPOINT": "localhost:9000",
+        "ASPNETCORE_DOMAIN": "http://localhost:9000"
       }
     },
     "https": {
@@ -24,7 +25,8 @@
         "ASPNETCORE_CONNECTION": "Host=localhost;Port=5432;Database=Dotnet;Username=postgres;Password=123456",
         "ASPNETCORE_MINIO_ACCESSKEY": "admin",
         "ASPNETCORE_MINIO_SECRETKEY": "password123",
-        "ASPNETCORE_MINIO_ENDPOINT": "localhost:9000"
+        "ASPNETCORE_MINIO_ENDPOINT": "localhost:9000",
+        "ASPNETCORE_DOMAIN": "http://localhost:9000"
       }
     }
   }

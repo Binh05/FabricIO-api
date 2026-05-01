@@ -1,15 +1,13 @@
-using FabricIO_api.Middleware;
 using Minio;
-using Minio.ApiEndpoints;
-using Minio.DataModel;
 using Minio.DataModel.Args;
 using System.IO.Compression;
 
 namespace FabricIO_api.Services;
 
-public class StorageServices(IMinioClient minioClient) : IStorageService
+public class StorageServices(IMinioClient minioClient, IConfiguration configuration) : IStorageService
 {
     private readonly string gameBucket = "game-assets";
+    private readonly string _domain = configuration["AppSettings:Domain"] ?? "http://localhost:9000";
     public async Task<string> ExtractAndUploadAsync(string zipPath, Guid gameId, CancellationToken token)
     {
         await CheckBucketAsync(gameBucket, token);
@@ -48,7 +46,7 @@ public class StorageServices(IMinioClient minioClient) : IStorageService
                 Directory.Delete(extractPath, true);
             }
         }
-        return gameId.ToString();
+        return $"{gameBucket}/{gameId}";
     }
 
     public string GetContentType(string file)
@@ -65,9 +63,9 @@ public class StorageServices(IMinioClient minioClient) : IStorageService
         };
     }
 
-    public string GetPublicUrl(string key)
+    public string GetPublicUrl(string objectName) 
     {
-        return $"http://localhost/{gameBucket}/{key}";
+        return $"{_domain}/{objectName}";
     }
 
     public async Task<string> UploadFileAsync(IFormFile file, string bucketName, string key, CancellationToken token)
@@ -86,7 +84,7 @@ public class StorageServices(IMinioClient minioClient) : IStorageService
             token
         );
 
-        return $"localhost:9000/{bucketName}/{key}";
+        return $"{bucketName}/{key}";
     }
     public async Task DeleteFolderAsync(string bucketName, string prefix, CancellationToken token)
     {

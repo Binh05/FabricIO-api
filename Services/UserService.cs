@@ -6,7 +6,7 @@ using FabricIO_api.UnitOfWork;
 
 namespace FabricIO_api.Services;
 
-public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
+public class UserService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService storageService) : IUserService
 {
     public async Task<IEnumerable<UserResponse>> GetAllAsync(UserRole role, CancellationToken token)
     {
@@ -17,19 +17,26 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
 
         return await unitOfWork.Users.GetAllAsync<UserResponse>(token);
     }
-    public async Task UpdateAvatarAsync(Guid userId, string avatarUrl, CancellationToken token)
+    public async Task<string> UpdateAvatarAsync(Guid userId, IFormFile imgFile, CancellationToken token)
     {
-        var user = await unitOfWork.Users.GetByIdAsync<User>(userId, token);
-
+        var user = await unitOfWork.Users.GetEntityAsync(u => u.Id == userId, token);
         if (user == null)
         {
             throw new NotFoundException("User không tồn tại");
+        }
+
+        var avatarUrl = await storageService.UploadFileAsync(imgFile, "file", userId.ToString(), token);
+        if (avatarUrl == null)
+        {
+            throw new BadRequestException("Upload avatar khong thanh cong");
         }
 
         user.AvatarUrl = avatarUrl;
 
         unitOfWork.Users.Update(user);
         await unitOfWork.SaveAsync(token);
+
+        return storageService.GetPublicUrl(avatarUrl);
     }
     public async Task<UserResponse> GetByIdAsync(Guid userId, CancellationToken token)
     {
@@ -39,6 +46,9 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper) : IUserService
         {
             throw new NotFoundException("User khong ton tai");
         }
+
+        if (user.AvatarUrl != null)
+            user.AvatarUrl = storageService.GetPublicUrl(user.AvatarUrl);
 
         return user;
     }

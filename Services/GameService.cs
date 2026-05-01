@@ -11,7 +11,11 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
     private readonly string gameBucket = "game-assets";
     public async Task<GameResponseDto> GetByIdAsync(Guid gameId, CancellationToken token)
     {
-        return await unitOfWork.Games.GetByIdAsync<GameResponseDto>(gameId, token);
+        var result = await unitOfWork.Games.GetByIdAsync<GameResponseDto>(gameId, token);
+
+        result.ThumbnailUrl = storageService.GetPublicUrl(result.ThumbnailUrl);
+
+        return result;
     }
     public async Task<GameResponseDto> CreateGameAsync(Guid userId, GameRequestDto gameReq, CancellationToken token)
     {
@@ -24,12 +28,12 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         var entity = mapper.Map<Game>(gameReq);
         entity.Id = Guid.NewGuid();
 
-        if (gameReq.Thumbnail != null)
+        if (gameReq.Thumbnail == null)
         {
-            var thumbKey = $"{entity.Id}/thumbnails/{entity.Id}.png";
-            await storageService.UploadFileAsync(gameReq.Thumbnail, "game-assets", thumbKey, token);
-            entity.ThumbnailUrl = storageService.GetPublicUrl(thumbKey);
+            throw new BadRequestException("Thiếu ảnh đại diện của game");
         }
+        var thumbKey = $"{entity.Id}/thumbnails/{entity.Id}.png"; // relative path without bucketname
+        entity.ThumbnailUrl = await storageService.UploadFileAsync(gameReq.Thumbnail, "game-assets", thumbKey, token);
 
         //if (gameReq.GameType == GameType.Browser)
         //{
@@ -43,10 +47,10 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
             await gameReq.GameFile.CopyToAsync(stream);
         }
 
-        var path = await storageService.ExtractAndUploadAsync(zipPath, entity.Id, token);
+        var path = await storageService.ExtractAndUploadAsync(zipPath, entity.Id, token); // return relavtive path with bucket name
         await storageService.UploadFileAsync(gameReq.GameFile, gameBucket, $"{path}/source.zip", token);
 
-        entity.GameUrl = storageService.GetPublicUrl($"{path}/index.html");
+        entity.GameUrl = $"{path}/index.html"; // relative path
         //}
 
         if (gameReq.TagIds != null && gameReq.TagIds.Any())
@@ -64,6 +68,10 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         await unitOfWork.SaveAsync(token);
 
         var result = await unitOfWork.Games.FindOneAsync<GameResponseDto>(g => g.Id == entity.Id, token);
+        if (result != null)
+        {
+            result.ThumbnailUrl = storageService.GetPublicUrl(result.ThumbnailUrl);
+        }
         return result!;
     }
 
@@ -71,7 +79,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
     {
         var game = await unitOfWork.Games.GetEntityAsync(g => g.Id == gameId, token);
 
-        if (game == null || game.GameType != GameType.Browser)
+        if (game == null || game.GameType != GameType.Browser || game.GameUrl == null)
             throw new Exception("Game không hỗ trợ play");
 
         var gamePlay = new GamePlay
@@ -83,12 +91,17 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         unitOfWork.GamePlays.Insert(gamePlay);
         await unitOfWork.SaveAsync(token);
 
-        return game.GameUrl!;
+        return storageService.GetPublicUrl(game.GameUrl);
     }
 
     public async Task<IEnumerable<GameResponseDto>> GetAsync(GetGameDto param, CancellationToken token)
     {
         var entities = await unitOfWork.Games.GetListAsync<GameResponseDto>(g => g.Title.Contains(param.Search), token);
+
+        foreach (var entity in entities)
+        {
+            entity.ThumbnailUrl = storageService.GetPublicUrl(entity.ThumbnailUrl);
+        }
 
         return entities;
     }

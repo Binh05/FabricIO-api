@@ -8,7 +8,7 @@ namespace FabricIO_api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(IUserService userService, IStorageService storageService) : ControllerBase
+public class UsersController(IUserService userService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<UserResponse>>> GetAllAsync(CancellationToken token)
@@ -106,10 +106,8 @@ public class UsersController(IUserService userService, IStorageService storageSe
             return BadRequest("Ảnh không hợp lệ");
         }
         var userId = User.GetUserId();
-        
-        var url = await storageService.UploadFileAsync(file, "file", userId.ToString(), token);
 
-        await userService.UpdateAvatarAsync(userId, url, token);
+        var url = await userService.UpdateAvatarAsync(userId, file, token);
 
         return Ok(new { avatarUrl = url });
     }

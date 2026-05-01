@@ -7,7 +7,7 @@ public interface IUserService
 {
     Task<IEnumerable<UserResponse>> GetAllAsync(UserRole role, CancellationToken token);
     Task<User> CheckUserExistingAsync(Guid userId, CancellationToken token);
-    Task UpdateAvatarAsync(Guid userId, string avatarUrl, CancellationToken token);
+    Task<string> UpdateAvatarAsync(Guid userId, IFormFile imgFile, CancellationToken token);
     Task<UserResponse> GetByIdAsync(Guid userId, CancellationToken token);
     Task<UserResponse> UpdateProfileAsync(Guid userId, UpdateUserDto user, CancellationToken token);
     Task<string> BanUploadGame(Guid userId, UserRole adminRole, CancellationToken token);
