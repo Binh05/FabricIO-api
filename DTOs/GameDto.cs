@@ -16,7 +16,7 @@ public class GameRequestDto
     [Required]
     public IFormFile GameFile { get; set; } = null!;
     public decimal Price { get; set; } = 0;
-    public IEnumerable<Guid> TagIds { get; set; } = [];
+    public List<Guid> TagIds { get; set; } = new();
 }
 
 public class GetGameDto

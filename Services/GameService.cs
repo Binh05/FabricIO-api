@@ -3,6 +3,7 @@ using FabricIO_api.DTOs;
 using FabricIO_api.Entities;
 using FabricIO_api.Middleware;
 using FabricIO_api.UnitOfWork;
+using Minio.DataModel.Notification;
 
 namespace FabricIO_api.Services;
 
@@ -32,6 +33,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         {
             throw new BadRequestException("Thiếu ảnh đại diện của game");
         }
+
         var thumbKey = $"{entity.Id}/thumbnails/{entity.Id}.png"; // relative path without bucketname
         entity.ThumbnailUrl = await storageService.UploadFileAsync(gameReq.Thumbnail, "game-assets", thumbKey, token);
 
@@ -51,16 +53,11 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         await storageService.UploadFileAsync(gameReq.GameFile, gameBucket, $"{path}/source.zip", token);
 
         entity.GameUrl = $"{path}/index.html"; // relative path
-        //}
+
 
         if (gameReq.TagIds != null && gameReq.TagIds.Any())
         {
-            var validTags = await unitOfWork.GameTags.GetListAsync<GameTag>(t => gameReq.TagIds.Contains(t.Id), token);
-            entity.GameTagMaps = validTags.Select(t => new GameTagMap
-            {
-                TagId = t.Id,
-                GameId = entity.Id
-            }).ToList();
+            await AddTagIds(entity, gameReq.TagIds, token);
         }
 
         entity.OwnerId = userId;
@@ -73,6 +70,20 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
             result.ThumbnailUrl = storageService.GetPublicUrl(result.ThumbnailUrl);
         }
         return result!;
+    }
+
+    private async Task AddTagIds(Game entity, List<Guid> tagIds, CancellationToken token)
+    {
+        var validTags = await unitOfWork.GameTags.GetListAsync<GameTag>(t => tagIds.Contains(t.Id), token);
+        if (validTags == null || validTags.Count() == 0)
+        {
+            throw new BadRequestException("Không có tag nào hợp lệ");
+        }
+        entity.GameTagMaps = validTags.Select(t => new GameTagMap
+        {
+            TagId = t.Id,
+            GameId = entity.Id
+        }).ToList();
     }
 
     public async Task<string> GetPlayUrlAsync(Guid userId, Guid gameId, CancellationToken token)
