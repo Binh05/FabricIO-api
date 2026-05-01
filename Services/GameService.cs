@@ -3,7 +3,6 @@ using FabricIO_api.DTOs;
 using FabricIO_api.Entities;
 using FabricIO_api.Middleware;
 using FabricIO_api.UnitOfWork;
-using Minio.DataModel.Notification;
 
 namespace FabricIO_api.Services;
 
@@ -50,7 +49,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         }
 
         var path = await storageService.ExtractAndUploadAsync(zipPath, entity.Id, token); // return relavtive path with bucket name
-        await storageService.UploadFileAsync(gameReq.GameFile, gameBucket, $"{path}/source.zip", token);
+        await storageService.UploadFileAsync(gameReq.GameFile, gameBucket, $"{entity.Id}/source.zip", token);
 
         entity.GameUrl = $"{path}/index.html"; // relative path
 
