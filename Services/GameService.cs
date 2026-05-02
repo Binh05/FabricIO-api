@@ -99,9 +99,9 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         return storageService.GetPublicUrl(game.GameUrl);
     }
 
-    public async Task<IEnumerable<GameResponseDto>> GetAsync(GetGameDto param, CancellationToken token)
+    public async Task<GamePaginationResult> GetAllAsync(Guid? userId, GetPaginationGameDto param, CancellationToken token)
     {
-        var entities = await unitOfWork.Games.GetListAsync<GameResponseDto>(g => g.Title.Contains(param.Search), token);
+        var entities = await unitOfWork.Games.GetPaginationGameAsync(userId, param, token);
 
         return entities;
     }

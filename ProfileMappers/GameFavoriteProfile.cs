@@ -9,6 +9,7 @@ public class GameFavoriteProfile: Profile
     public GameFavoriteProfile()
     {
         CreateMap<GameFavorite, GameResponseDto>()
-            .IncludeMembers(src => src.Game);
+            .IncludeMembers(src => src.Game)
+            .ForMember(dest => dest.IsFavorite, opt => opt.MapFrom(src => true));
     }
 }

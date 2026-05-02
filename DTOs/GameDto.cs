@@ -19,11 +19,11 @@ public class GameRequestDto
     public List<Guid> TagIds { get; set; } = new();
 }
 
-public class GetGameDto
+public class GetPaginationGameDto
 {
     public string Search { get; set; } = string.Empty;
-    public int? Page { get; set; }
-    public int? PageSize { get; set; }
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 12;
 }
 
 public class GameDownloadDto
@@ -40,6 +40,7 @@ public class GameResponseDto
     public string ThumbnailUrl { get; set; } = null!;
     public GameType GameType { get; set; }
     public decimal Price { get; set; } = 0;
+    public bool IsFavorite { get; set; } = false;
     public IEnumerable<GameTagResponse> GameTags { get; set; } = [];
     public DateTime CreatedAt { get; set; }
 }
@@ -66,4 +67,10 @@ public class FeaturedGameRatingRequest
 {
     [Range(1, 100, ErrorMessage = "Top phải nằm trong khoảng từ 1 đến 100")]
     public int Top { get; set; } = 6;
+}
+
+public class GamePaginationResult : PaginationDto
+{
+    public int Total { get; set; }
+    public IEnumerable<GameResponseDto> Items { get; set; } = [];
 }

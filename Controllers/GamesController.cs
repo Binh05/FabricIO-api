@@ -30,11 +30,12 @@ public class GamesController(IGameServices gameServices) : ControllerBase
     }
     [AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GameResponseDto>>> GetGamesAsync([FromQuery] GetGameDto param, CancellationToken token)
+    public async Task<ActionResult<GamePaginationResult>> GetGamesAsync([FromQuery] GetPaginationGameDto param, CancellationToken token)
     {
-        var entities = await gameServices.GetAsync(param, token);
+        var userId = User.TryGetUserId();
+        var entities = await gameServices.GetAllAsync(userId, param, token);
 
-        return Ok(new { GameTotal = entities.Count(), games = entities});
+        return Ok(entities);
     }
 
     [AllowAnonymous]
