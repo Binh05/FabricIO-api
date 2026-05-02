@@ -14,7 +14,7 @@ public class UserProfile : Profile
 
         CreateMap<UserRegister, User>().ForMember(dest => dest.HashedPassword, opt => opt.MapFrom(src => src.Password));
         CreateMap<User, UserDisplay>();
-        CreateMap<GamePurchase, GameCardDto>()
+        CreateMap<GamePurchase, GameResponseDto>()
             .IncludeMembers(src => src.Game);
     }
 }

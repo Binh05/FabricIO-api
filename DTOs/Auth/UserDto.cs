@@ -33,20 +33,27 @@ public class ChangePasswordDto
     [Required]
     public required string ConfirmPassword { get; set; }
 }
-public class GameCardDto
-{
-    public Guid Id { get; set; }
-    public Guid OwnerId { get; set; }
-    public required string Title { get; set; }
-    public string? Description { get; set; }
-    public string? ThumbnailUrl { get; set; }
-    public decimal Price { get; set; }
-}
 
 public class UserRatedResponse
 {
     public Guid RatingId { get; set; }
     public int Stars { get; set; }
-    public required GameCardDto Game { get; set; }
+    public required GameResponseDto Game { get; set; }
     public DateTime CreatedAt { get; set; }
+}
+
+public class UpdateAccountBanDto
+{
+    public bool IsBanned { get; set; }
+    public DateTime? BanExpiresAt { get; set; }
+}
+
+public class UpdatePostBanDto
+{
+    public bool IsPostBanned { get; set; }
+}
+
+public class UpdateGameBanDto
+{
+    public bool IsGameBanned { get; set; }
 }

@@ -106,39 +106,82 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
 
         return data;
     }
-    public async Task<IEnumerable<GameCardDto>> GetGamePaidAsync(Guid userId, CancellationToken token)
+    public async Task<IEnumerable<GameResponseDto>> GetGamePaidAsync(Guid userId, CancellationToken token)
     {
-        var data = await unitOfWork.GamePurchases.GetListAsync<GameCardDto>(p => p.BuyerId == userId, token);
+        var data = await unitOfWork.GamePurchases.GetListAsync<GameResponseDto>(p => p.BuyerId == userId, token);
 
         return data;
     }
 
-    public async Task<IEnumerable<GameCardDto>> GetGameFavoritesAsync(Guid userId, CancellationToken token)
+    public async Task<IEnumerable<GameResponseDto>> GetGameFavoritesAsync(Guid userId, CancellationToken token)
     {
-        var data = await unitOfWork.GameFavorites.GetListAsync<GameCardDto>(p => p.UserId == userId, token);
+        var data = await unitOfWork.GameFavorites.GetListAsync<GameResponseDto>(p => p.UserId == userId, token);
 
         return data;
     }
 
-    public async Task<IEnumerable<GameCardDto>> GetMyGameAsync(Guid userId, CancellationToken token)
+    public async Task<IEnumerable<GameResponseDto>> GetMyGameAsync(Guid userId, CancellationToken token)
     {
-        return await unitOfWork.Games.GetListAsync<GameCardDto>(g => g.OwnerId == userId, token);
+        return await unitOfWork.Games.GetListAsync<GameResponseDto>(g => g.OwnerId == userId, token);
     }
 
-    public async Task<string> BanUploadGame(Guid userId, UserRole adminRole, CancellationToken token)
+    public async Task<string> UpdateGameBannedAsync(Guid userId, bool isGameBanned, UserRole adminRole, CancellationToken token)
     {
         if (adminRole != UserRole.Admin)
         {
-            throw new ForbidException("Không có quyền cấm người chơi khác");
+            throw new ForbidException("Không có quyền thực hiện thao tác này");
         }
 
         var user = await unitOfWork.Users.GetEntityAsync(u => u.Id == userId, token);
         if (user == null)
         {
-            throw new NotFoundException("User bị ban không tồn tại");
+            throw new NotFoundException("User không tồn tại");
         }
 
-        user.IsGameBanned = true;
+        user.IsGameBanned = isGameBanned;
+        unitOfWork.Users.Update(user);
+        await unitOfWork.SaveAsync(token);
+
+        return user.Username;
+    }
+
+    public async Task<string> UpdateBannedAsync(Guid userId, bool isBanned, DateTime? banExpiresAt, UserRole adminRole, CancellationToken token)
+    {
+        if (adminRole != UserRole.Admin)
+        {
+            throw new ForbidException("Không có quyền thực hiện thao tác này");
+        }
+
+        var user = await unitOfWork.Users.GetEntityAsync(u => u.Id == userId, token);
+        if (user == null)
+        {
+            throw new NotFoundException("User không tồn tại");
+        }
+
+        user.IsBanned = isBanned;
+        user.BanExpiresAt = banExpiresAt;
+        
+        unitOfWork.Users.Update(user);
+        await unitOfWork.SaveAsync(token);
+
+        return user.Username;
+    }
+
+    public async Task<string> UpdatePostBannedAsync(Guid userId, bool isPostBanned, UserRole adminRole, CancellationToken token)
+    {
+        if (adminRole != UserRole.Admin)
+        {
+            throw new ForbidException("Không có quyền thực hiện thao tác này");
+        }
+
+        var user = await unitOfWork.Users.GetEntityAsync(u => u.Id == userId, token);
+        if (user == null)
+        {
+            throw new NotFoundException("User không tồn tại");
+        }
+
+        user.IsPostBanned = isPostBanned;
+        
         unitOfWork.Users.Update(user);
         await unitOfWork.SaveAsync(token);
 

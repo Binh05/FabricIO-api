@@ -8,12 +8,7 @@ public class GameFavoriteProfile: Profile
 {
     public GameFavoriteProfile()
     {
-        CreateMap<GameFavorite, GameFavoriteResponse>()
+        CreateMap<GameFavorite, GameResponseDto>()
             .IncludeMembers(src => src.Game);
-
-        CreateMap<GameFavorite, GameCardDto>()
-            .IncludeMembers(src => src.Game);
-
-        CreateMap<Game, GameFavoriteResponse>();
     }
 }

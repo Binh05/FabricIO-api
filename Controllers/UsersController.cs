@@ -10,16 +10,6 @@ namespace FabricIO_api.Controllers;
 [Route("api/[controller]")]
 public class UsersController(IUserService userService) : ControllerBase
 {
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserResponse>>> GetAllAsync(CancellationToken token)
-    {
-        var role = User.GetRole();
-
-        var data = await userService.GetAllAsync(role, token);
-
-        return Ok(data);
-    }
-
     [HttpGet("{userId}")]
     public async Task<ActionResult<UserResponse>> GetUserById([FromRoute] Guid userId, CancellationToken token)
     {
@@ -39,7 +29,7 @@ public class UsersController(IUserService userService) : ControllerBase
     }
 
     [HttpGet("mygame")]
-    public async Task<ActionResult<IEnumerable<GameCardDto>>> GetMyGameAsync(CancellationToken token)
+    public async Task<ActionResult<IEnumerable<GameResponseDto>>> GetMyGameAsync(CancellationToken token)
     {
         var userId = User.GetUserId();
 
@@ -59,7 +49,7 @@ public class UsersController(IUserService userService) : ControllerBase
     }
 
     [HttpGet("gamepaid")]
-    public async Task<ActionResult<IEnumerable<GameCardDto>>> GetGamePaidAsync(CancellationToken token)
+    public async Task<ActionResult<IEnumerable<GameResponseDto>>> GetGamePaidAsync(CancellationToken token)
     {
         var userId = User.GetUserId();
 
@@ -69,23 +59,13 @@ public class UsersController(IUserService userService) : ControllerBase
     }
 
     [HttpGet("gamefavorite")]
-    public async Task<ActionResult<IEnumerable<GameCardDto>>> GetGameFavoriteAsync(CancellationToken token)
+    public async Task<ActionResult<IEnumerable<GameResponseDto>>> GetGameFavoriteAsync(CancellationToken token)
     {
         Guid userId = User.GetUserId();
 
         var data = await userService.GetGameFavoritesAsync(userId, token);
 
         return Ok(data);
-    }
-
-    [HttpPost("{userId}/gameban")]
-    public async Task<IActionResult> BanUploadGameAsync([FromRoute] Guid userId, CancellationToken token)
-    {
-        var role = User.GetRole();
-
-        var usernameBaned = await userService.BanUploadGame(userId, role, token);
-
-        return Ok(new { message = $"Đã ban người chơi {usernameBaned} upload game"});
     }
     
     [HttpPatch("profile")]

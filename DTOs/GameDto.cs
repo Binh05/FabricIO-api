@@ -41,6 +41,7 @@ public class GameResponseDto
     public GameType GameType { get; set; }
     public decimal Price { get; set; } = 0;
     public IEnumerable<GameTagResponse> GameTags { get; set; } = [];
+    public DateTime CreatedAt { get; set; }
 }
 
 public class GamePlayResponseDto

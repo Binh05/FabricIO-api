@@ -18,7 +18,6 @@ public class GameProfile : Profile
             : $"{_domain}/{src.ThumbnailUrl}"));
         CreateMap<Game, GameRequestDto>();
 
-        CreateMap<Game, GameCardDto>();
         CreateMap<GamePlay, GamePlayDto>();
 
         CreateMap<Game, FeaturedGameRatingResponse>()
