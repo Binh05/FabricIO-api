@@ -79,15 +79,15 @@ public class UsersController(IUserService userService) : ControllerBase
     }
 
     [HttpPatch("avatar")]
-    public async Task<ActionResult<string>> UploadAvatarAsync(IFormFile file, CancellationToken token)
+    public async Task<ActionResult<string>> UploadAvatarAsync(IFormFile imgFile, CancellationToken token)
     {
-        if (file == null || file.Length == 0)
+        if (imgFile == null || imgFile.Length == 0)
         {
             return BadRequest("Ảnh không hợp lệ");
         }
         var userId = User.GetUserId();
 
-        var url = await userService.UpdateAvatarAsync(userId, file, token);
+        var url = await userService.UpdateAvatarAsync(userId, imgFile, token);
 
         return Ok(new { avatarUrl = url });
     }
