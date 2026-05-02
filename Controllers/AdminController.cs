@@ -10,7 +10,7 @@ namespace FabricIO_api.Controllers;
 [Route("api/[controller]")]
 public class AdminController(IUserService userService) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("users")]
     public async Task<ActionResult<IEnumerable<UserResponse>>> GetAllAsync(CancellationToken token)
     {
         var role = User.GetRole();
