@@ -29,17 +29,8 @@ public class GamePurchaseService(IUnitOfWork unitOfWork, IMapper mapper) : IGame
             AmountPaid = req.Amound
         };
 
-        try
-        {
-            unitOfWork.GamePurchases.Insert(purchase);
-            await unitOfWork.SaveAsync(token);
-        }
-        catch (Exception ex)
-        {
-            // Log hoặc xem giá trị của ex.InnerException.Message ở đây
-            var message = ex.InnerException?.Message ?? ex.Message;
-            throw new Exception($"Lỗi DB: {message}");
-        }
+        unitOfWork.GamePurchases.Insert(purchase);
+        await unitOfWork.SaveAsync(token);
 
         return mapper.Map<GamePurchaseResponse>(purchase);
     }
