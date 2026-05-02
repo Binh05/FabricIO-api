@@ -6,6 +6,5 @@ namespace FabricIO_api.UnitOfWork
     public interface IGameRatingRepository : IRepository<GameRating>
     {
         Task<GameRatingResponse> GetRatingAsync(Guid gameId, CancellationToken token);
-        Task<IEnumerable<FeaturedGameRatingResponse>> GetTopRatingGamesAsync(int top, CancellationToken token);
     }
 }

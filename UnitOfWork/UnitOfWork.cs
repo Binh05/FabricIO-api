@@ -9,8 +9,8 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
     private readonly IRepository<User> users = new Repository<User>(mapper, ctx);
     public IRepository<User> Users => users;
 
-    private readonly IRepository<Game> games = new Repository<Game>(mapper, ctx);
-    public IRepository<Game> Games => games;
+    private readonly IGameRepository games = new GameRepository(mapper, ctx);
+    public IGameRepository Games => games;
 
     private readonly IRepository<Session> sessions = new Repository<Session>(mapper, ctx);
     public IRepository<Session> Sessions => sessions;

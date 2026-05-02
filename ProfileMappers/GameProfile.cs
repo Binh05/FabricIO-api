@@ -15,6 +15,12 @@ public class GameProfile: Profile
 
         CreateMap<Game, GameCardDto>();
         CreateMap<GamePlay, GamePlayDto>();
+
+        CreateMap<Game, FeaturedGameRatingResponse>()
+            .ForMember(dest => dest.Game, opt => opt.MapFrom(src => src))
+            .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src => src.GameRatings.Any() ? 
+            src.GameRatings.Average(r => (double)r.Stars): 0))
+            .ForMember(dest => dest.TotalRating, opt => opt.MapFrom(src => src.GameRatings.Count()));
     }
 
 }

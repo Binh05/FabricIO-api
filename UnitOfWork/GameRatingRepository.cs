@@ -27,20 +27,4 @@ public class GameRatingRepository(IMapper mapper, AppDbContext dbContext) : Repo
         };
     }
 
-    public async Task<IEnumerable<FeaturedGameRatingResponse>> GetTopRatingGamesAsync(int top, CancellationToken token)
-    {
-        var result = await dbContext.GameRatings
-        .GroupBy(r => r.GameId)
-        .Select(g => new FeaturedGameRatingResponse
-        {
-            AverageRating = g.Average(x => (double)x.Stars),
-            TotalRating = g.Count(),
-            Game = mapper.Map<GameResponseDto>(g.Key)
-        })
-        .OrderByDescending(g => g.AverageRating)
-        .Take(top)
-        .ToListAsync(token);
-
-        return result;
-    }
 }

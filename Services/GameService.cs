@@ -168,7 +168,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
 
     public async Task<IEnumerable<FeaturedGameRatingResponse>> GetTopRatingGamesAsync(int top, CancellationToken token)
     {
-        var result = await unitOfWork.GameRatings.GetTopRatingGamesAsync(top, token);
+        var result = await unitOfWork.Games.GetTopGameRatingsAsync(top, token);
 
         return result;
     }
