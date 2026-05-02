@@ -13,8 +13,6 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
     {
         var result = await unitOfWork.Games.GetByIdAsync<GameResponseDto>(gameId, token);
 
-        result.ThumbnailUrl = storageService.GetPublicUrl(result.ThumbnailUrl);
-
         return result;
     }
     public async Task<GameResponseDto> CreateGameAsync(Guid userId, GameRequestDto gameReq, CancellationToken token)
@@ -64,10 +62,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         await unitOfWork.SaveAsync(token);
 
         var result = await unitOfWork.Games.FindOneAsync<GameResponseDto>(g => g.Id == entity.Id, token);
-        if (result != null)
-        {
-            result.ThumbnailUrl = storageService.GetPublicUrl(result.ThumbnailUrl);
-        }
+        
         return result!;
     }
 
@@ -107,11 +102,6 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
     public async Task<IEnumerable<GameResponseDto>> GetAsync(GetGameDto param, CancellationToken token)
     {
         var entities = await unitOfWork.Games.GetListAsync<GameResponseDto>(g => g.Title.Contains(param.Search), token);
-
-        foreach (var entity in entities)
-        {
-            entity.ThumbnailUrl = storageService.GetPublicUrl(entity.ThumbnailUrl);
-        }
 
         return entities;
     }

@@ -4,13 +4,18 @@ using FabricIO_api.Entities;
 
 namespace FabricIO_api.ProfileMappers;
 
-public class GameProfile: Profile
+public class GameProfile : Profile
 {
+    public static string? _domain { get; set; }
     public GameProfile()
     {
         CreateMap<Game, Game>();
         CreateMap<GameRequestDto, Game>();
-        CreateMap<Game, GameResponseDto>().ForMember(dest => dest.GameTags, opt => opt.MapFrom(g => g.GameTagMaps));
+        CreateMap<Game, GameResponseDto>()
+            .ForMember(dest => dest.GameTags, opt => opt.MapFrom(g => g.GameTagMaps))
+            .ForMember(dest => dest.ThumbnailUrl, opt => opt.MapFrom(src => string.IsNullOrEmpty(src.ThumbnailUrl)
+            ? null
+            : $"{_domain}/{src.ThumbnailUrl}"));
         CreateMap<Game, GameRequestDto>();
 
         CreateMap<Game, GameCardDto>();

@@ -1,6 +1,7 @@
 using FabricIO_api.DataAccess;
 using FabricIO_api.Entities;
 using FabricIO_api.Middleware;
+using FabricIO_api.ProfileMappers;
 using FabricIO_api.Services;
 using FabricIO_api.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -68,7 +69,9 @@ builder.Services.AddMinio(configureClient => configureClient
     .WithSSL(false)
     .Build());
 
+GameProfile._domain = builder.Configuration["AppSettings:Domain"] ?? "http://localhost";
 builder.Services.AddAutoMapper(config => {}, Assembly.GetExecutingAssembly());
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGameServices, GameService>();
