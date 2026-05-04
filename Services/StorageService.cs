@@ -84,7 +84,7 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
             token
         );
 
-        return $"{bucketName}/{key}";
+        return $"{_domain}/{bucketName}/{key}";
     }
     public async Task DeleteFolderAsync(string bucketName, string prefix, CancellationToken token)
     {
