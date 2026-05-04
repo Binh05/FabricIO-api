@@ -25,7 +25,7 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
             throw new NotFoundException("User không tồn tại");
         }
 
-        var avatarUrl = await storageService.UploadFileAsync(imgFile, "file", userId.ToString(), token);
+        var avatarUrl = await storageService.UploadFileAsync(imgFile, "file", $"avatars/{userId}.png", token);
         if (avatarUrl == null)
         {
             throw new BadRequestException("Upload avatar khong thanh cong");
@@ -36,7 +36,7 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         unitOfWork.Users.Update(user);
         await unitOfWork.SaveAsync(token);
 
-        return storageService.GetPublicUrl(avatarUrl);
+        return avatarUrl;
     }
     public async Task<UserResponse> GetByIdAsync(Guid userId, CancellationToken token)
     {
@@ -46,9 +46,6 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         {
             throw new NotFoundException("User khong ton tai");
         }
-
-        if (user.AvatarUrl != null)
-            user.AvatarUrl = storageService.GetPublicUrl(user.AvatarUrl);
 
         return user;
     }

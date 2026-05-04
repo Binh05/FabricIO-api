@@ -96,7 +96,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         unitOfWork.GamePlays.Insert(gamePlay);
         await unitOfWork.SaveAsync(token);
 
-        return storageService.GetPublicUrl(game.GameUrl);
+        return game.GameUrl;
     }
 
     public async Task<GamePaginationResult> GetAllAsync(Guid? userId, GetPaginationGameDto param, CancellationToken token)

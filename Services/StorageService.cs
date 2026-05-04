@@ -46,7 +46,7 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
                 Directory.Delete(extractPath, true);
             }
         }
-        return $"{gameBucket}/{gameId}";
+        return $"{_domain}/{gameBucket}/{gameId}";
     }
 
     public string GetContentType(string file)

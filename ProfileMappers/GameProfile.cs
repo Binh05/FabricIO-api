@@ -12,10 +12,7 @@ public class GameProfile : Profile
         CreateMap<Game, Game>();
         CreateMap<GameRequestDto, Game>();
         CreateMap<Game, GameResponseDto>()
-            .ForMember(dest => dest.GameTags, opt => opt.MapFrom(g => g.GameTagMaps))
-            .ForMember(dest => dest.ThumbnailUrl, opt => opt.MapFrom(src => string.IsNullOrEmpty(src.ThumbnailUrl)
-            ? null
-            : $"{_domain}/{src.ThumbnailUrl}"));
+            .ForMember(dest => dest.GameTags, opt => opt.MapFrom(g => g.GameTagMaps));
         CreateMap<Game, GameRequestDto>();
 
         CreateMap<GamePlay, GamePlayDto>();
