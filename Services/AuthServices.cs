@@ -24,6 +24,7 @@ public class AuthServices(IOptionsMonitor<AppSetting> optionsMonitor, IMapper ma
 
         var entity = mapper.Map<User>(userInfo);
         entity.HashedPassword = BCrypt.Net.BCrypt.HashPassword(entity.HashedPassword);
+        entity.AvatarUrl = "https://i.pinimg.com/474x/49/12/eb/4912eb00a1043cdebdd33e22889d7f10.jpg";
 
         unitOfWork.Users.Insert(entity);
 
