@@ -37,16 +37,9 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         //if (gameReq.GameType == GameType.Browser)
         //{
         if (gameReq.GameFile == null)
-            throw new Exception("Browser game cần file zip");
+            throw new BadRequestException("Browser game cần file zip");
 
-        var zipPath = Path.GetTempFileName();
-
-        using (var stream = File.Create(zipPath))
-        {
-            await gameReq.GameFile.CopyToAsync(stream);
-        }
-
-        var path = await storageService.ExtractAndUploadAsync(zipPath, entity.Id, token); // return relavtive path with bucket name
+        var path = await storageService.ExtractAndUploadAsync(gameReq.GameFile, entity.Id, token); // return relavtive path with bucket name
         await storageService.UploadFileAsync(gameReq.GameFile, gameBucket, $"{entity.Id}/source.zip", token);
 
         entity.GameUrl = $"{path}/index.html"; // relative path
@@ -64,20 +57,6 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         var result = await unitOfWork.Games.FindOneAsync<GameResponseDto>(g => g.Id == entity.Id, token);
         
         return result!;
-    }
-
-    private async Task AddTagIds(Game entity, List<Guid> tagIds, CancellationToken token)
-    {
-        var validTags = await unitOfWork.GameTags.GetListAsync<GameTag>(t => tagIds.Contains(t.Id), token);
-        if (validTags == null || validTags.Count() == 0)
-        {
-            throw new BadRequestException("Không có tag nào hợp lệ");
-        }
-        entity.GameTagMaps = validTags.Select(t => new GameTagMap
-        {
-            TagId = t.Id,
-            GameId = entity.Id
-        }).ToList();
     }
 
     public async Task<string> GetPlayUrlAsync(Guid userId, Guid gameId, CancellationToken token)
@@ -161,5 +140,68 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         var result = await unitOfWork.Games.GetTopGameRatingsAsync(top, token);
 
         return result;
+    }
+
+    public async Task<GameResponseDto> UpdateGameAsync(Guid userId, Guid gameId, UpdateGameRequest req, CancellationToken token)
+    {
+        var game = await unitOfWork.Games.GetGameWithTagMapsAsync(gameId, token);
+        if (game == null)
+        {
+            throw new NotFoundException("Game khong ton tai");
+        }
+
+        if (game.OwnerId != userId)
+        {
+            throw new UnauthorizedException("Khong co quyen sua game nay");
+        }
+
+        mapper.Map(req, game);
+
+        await unitOfWork.BeginTransactionAsync(token);
+        try
+        {
+            if (req.Thumbnail != null)
+            {
+                game.ThumbnailUrl = await storageService.UploadFileAsync(req.Thumbnail, "file", $"avatars/{game.OwnerId}", token);
+            }
+
+            if (req.GameFile != null)
+            {
+                var path = await storageService.ExtractAndUploadAsync(req.GameFile, gameId, token);
+                await storageService.UploadFileAsync(req.GameFile, gameBucket, $"{gameId}/source.zip", token);
+
+                game.GameUrl = $"{path}/index.html";
+            }
+
+            if (req.TagIds != null)
+            {
+                game.GameTagMaps.Clear();
+
+                await AddTagIds(game, req.TagIds, token);
+            }
+
+            await unitOfWork.CommitAsync(token);
+        }
+        catch
+        {
+            await unitOfWork.RollBackAsync(token);
+            throw;
+        }
+
+        return await unitOfWork.Games.GetByIdAsync<GameResponseDto>(gameId, token);
+    }
+
+    private async Task AddTagIds(Game entity, List<Guid> tagIds, CancellationToken token)
+    {
+        var validTags = await unitOfWork.GameTags.GetListAsync<GameTag>(t => tagIds.Contains(t.Id), token);
+        if (validTags == null || validTags.Count() == 0)
+        {
+            throw new BadRequestException("Không có tag nào hợp lệ");
+        }
+        entity.GameTagMaps = validTags.Select(t => new GameTagMap
+        {
+            TagId = t.Id,
+            GameId = entity.Id
+        }).ToList();
     }
 }

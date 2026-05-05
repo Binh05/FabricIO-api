@@ -62,5 +62,10 @@ namespace FabricIO_api.UnitOfWork
 
             return result;
         }
+
+        public async Task<Game?> GetGameWithTagMapsAsync(Guid gameId, CancellationToken token)
+        {
+            return await dbContext.Games.Include(g => g.GameTagMaps).FirstOrDefaultAsync(g => g.Id == gameId,token);
+        }
     }
 }

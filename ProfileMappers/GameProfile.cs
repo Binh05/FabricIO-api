@@ -22,6 +22,9 @@ public class GameProfile : Profile
             .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src => src.GameRatings.Any() ? 
             src.GameRatings.Average(r => (double)r.Stars): 0))
             .ForMember(dest => dest.TotalRating, opt => opt.MapFrom(src => src.GameRatings.Count()));
+
+        CreateMap<UpdateGameRequest, Game>()
+            .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
     }
 
 }

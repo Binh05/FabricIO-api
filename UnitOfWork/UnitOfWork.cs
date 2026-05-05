@@ -1,6 +1,7 @@
 using AutoMapper;
 using FabricIO_api.DataAccess;
 using FabricIO_api.Entities;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FabricIO_api.UnitOfWork;
 
@@ -47,8 +48,26 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
 
     private readonly IGamePlayRepository gamePlays = new GamePlayRepository(mapper, ctx);
     public IGamePlayRepository GamePlays => gamePlays;
+
+    private IDbContextTransaction transaction;
     public async Task SaveAsync(CancellationToken token)
     {
         await ctx.SaveChangesAsync(token);
+    }
+
+    public async Task BeginTransactionAsync(CancellationToken token)
+    {
+        transaction = await ctx.Database.BeginTransactionAsync(token);
+    }
+
+    public async Task CommitAsync(CancellationToken token)
+    {
+        await ctx.SaveChangesAsync(token);
+        await transaction.CommitAsync(token);
+    }
+
+    public async Task RollBackAsync(CancellationToken token)
+    {
+        await transaction.RollbackAsync(token);
     }
 }

@@ -10,6 +10,7 @@ public interface IGameServices
     Task<string> GetPlayUrlAsync(Guid userId, Guid gameId, CancellationToken token);
     Task<GamePaginationResult> GetAllAsync(Guid? userId, GetPaginationGameDto param ,CancellationToken token);
     Task InsertAsync(Guid userId, Game game, CancellationToken token);
+    Task<GameResponseDto> UpdateGameAsync(Guid userId, Guid gameId, UpdateGameRequest req, CancellationToken token);
     Task DeleteAsync(Guid userId, Guid gameId, CancellationToken token);
     Task<IEnumerable<Game>> InsertRangeAsync(IEnumerable<GameRequestDto> games, CancellationToken token);
     Task<GameDownloadDto> DownloadGameAsync(Guid gameId, CancellationToken token);

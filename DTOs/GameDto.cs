@@ -14,9 +14,21 @@ public class GameRequestDto
     [Required]
     public GameType GameType { get; set; }
     [Required]
-    public IFormFile GameFile { get; set; } = null!;
+    public required IFormFile GameFile { get; set; } = null!;
     public decimal Price { get; set; } = 0;
     public List<Guid> TagIds { get; set; } = new();
+}
+
+public class UpdateGameRequest
+{
+    public string? Title { get; set; } = null!;
+    [MaxLength(500, ErrorMessage = "Mô tả chỉ tối đa 500 ký tự")]
+    public string? Description { get; set; }
+    public IFormFile? Thumbnail { get; set; }
+    public GameType? GameType { get; set; }
+    public IFormFile? GameFile { get; set; }
+    public decimal? Price { get; set; }
+    public List<Guid>? TagIds { get; set; }
 }
 
 public class GetPaginationGameDto

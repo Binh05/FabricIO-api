@@ -98,6 +98,18 @@ public class GamesController(IGameServices gameServices) : ControllerBase
 
         return entities;
     }
+
+    [HttpPatch("{gameId}")]
+    [Consumes("multipart/form-data")]
+    [RequestSizeLimit(524288000)]
+    public async Task<GameResponseDto> UpdateGameAsync(
+        [FromRoute] Guid gameId,
+        [FromForm] UpdateGameRequest req,
+        CancellationToken token)
+    {
+        var userId = User.GetUserId();
+        return await gameServices.UpdateGameAsync(userId, gameId, req, token);
+    }
     
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteGameAsync([FromRoute] Guid id, CancellationToken token)

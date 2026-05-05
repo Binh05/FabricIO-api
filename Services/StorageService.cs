@@ -8,9 +8,16 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
 {
     private readonly string gameBucket = "game-assets";
     private readonly string _domain = configuration["AppSettings:Domain"] ?? "http://localhost:9000";
-    public async Task<string> ExtractAndUploadAsync(string zipPath, Guid gameId, CancellationToken token)
+    public async Task<string> ExtractAndUploadAsync(IFormFile fileZip, Guid gameId, CancellationToken token)
     {
         await CheckBucketAsync(gameBucket, token);
+
+        var zipPath = Path.GetTempFileName();
+
+        using (var stream = File.Create(zipPath))
+        {
+            await fileZip.CopyToAsync(stream);
+        }
 
         var extractPath = Path.Combine(Path.GetTempPath(), gameId.ToString());
 

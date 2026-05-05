@@ -7,5 +7,7 @@ namespace FabricIO_api.UnitOfWork
     {
         Task<GamePaginationResult> GetPaginationGameAsync(Guid? userId, GetPaginationGameDto req, CancellationToken token);
         Task<IEnumerable<FeaturedGameRatingResponse>> GetTopGameRatingsAsync(int top, CancellationToken token);
+
+        Task<Game?> GetGameWithTagMapsAsync(Guid gameId, CancellationToken token);
     }
 }
