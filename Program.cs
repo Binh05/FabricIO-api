@@ -52,16 +52,15 @@ builder.Services.AddSwaggerGen(c =>
 // DbContext Config
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    var connectionString = Environment.GetEnvironmentVariable("ASPNETCORE_CONNECTION") 
-                           ?? builder.Configuration.GetConnectionString("DefaultConnection");
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseNpgsql(connectionString);
 });
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 //MinIO Config
-var accessKey = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ACCESSKEY") ?? builder.Configuration["Storage:AccessKey"];
-var secretKeyMinio = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_SECRETKEY") ?? builder.Configuration["Storage:SecretKey"];
-var endpoint = Environment.GetEnvironmentVariable("ASPNETCORE_MINIO_ENDPOINT") ?? builder.Configuration["Storage:EndPoint"];
+var accessKey = builder.Configuration["Storage:AccessKey"];
+var secretKeyMinio = builder.Configuration["Storage:SecretKey"];
+var endpoint = builder.Configuration["Storage:EndPoint"];
 
 builder.Services.AddMinio(configureClient => configureClient
     .WithEndpoint(endpoint)

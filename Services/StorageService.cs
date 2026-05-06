@@ -8,7 +8,7 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
 {
     private readonly string gameBucket = "game-assets";
     private readonly string _domain = configuration["AppSettings:Domain"] ?? "http://localhost:9000";
-    public async Task<string> ExtractAndUploadAsync(IFormFile fileZip, Guid gameId, CancellationToken token)
+    public async Task<string> ExtractAndUploadAsync(IFormFile fileZip, string rootPath, CancellationToken token)
     {
         await CheckBucketAsync(gameBucket, token);
 
@@ -19,7 +19,7 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
             await fileZip.CopyToAsync(stream);
         }
 
-        var extractPath = Path.Combine(Path.GetTempPath(), gameId.ToString());
+        var extractPath = Path.Combine(Path.GetTempPath(), rootPath);
 
         try
         {
@@ -39,7 +39,7 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
 
                 await minioClient.PutObjectAsync(new PutObjectArgs()
                     .WithBucket(gameBucket)
-                    .WithObject($"{gameId}/{relativePath}")
+                    .WithObject($"{rootPath}/{relativePath}")
                     .WithStreamData(stream)
                     .WithObjectSize(stream.Length)
                     .WithContentType(GetContentType(file)),
@@ -52,8 +52,12 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
             {
                 Directory.Delete(extractPath, true);
             }
+            if (File.Exists(zipPath))
+            {
+                File.Delete(zipPath);
+            }
         }
-        return $"{_domain}/{gameBucket}/{gameId}";
+        return $"{_domain}/{gameBucket}/{rootPath}";
     }
 
     public string GetContentType(string file)
@@ -96,6 +100,15 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
     public async Task DeleteFolderAsync(string bucketName, string prefix, CancellationToken token)
     {
         await CheckBucketAsync(bucketName, token);
+        
+        prefix = ExtractObjectKey(prefix);
+        var parts = prefix.Split('/', 2);
+        if (parts.Length > 1 && parts[0] == bucketName) 
+        {
+            prefix = parts[1];
+        }
+
+        prefix = prefix.TrimEnd('/');
 
         var objects = minioClient.ListObjectsEnumAsync(
             new ListObjectsArgs()
@@ -136,7 +149,7 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
         var url = await minioClient.PresignedGetObjectAsync( 
             new PresignedGetObjectArgs()
             .WithBucket(gameBucket)
-            .WithObject($"{fileId}/source.zip")
+            .WithObject($"{fileId}/source-{fileId}.zip")
             .WithExpiry(60 * 60));
 
         return url;
@@ -148,17 +161,29 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
 
         Console.WriteLine($"Extracted object key: {objectKey}");
         
+        var parts = objectKey.Split('/', 2);
+        if (parts.Length < 2) return;
+        var bucket = parts[0];
+        var key = parts[1];
+
         await minioClient.RemoveObjectAsync(
             new RemoveObjectArgs()
-                .WithBucket("file")
-                .WithObject(objectKey),
+                .WithBucket(bucket)
+                .WithObject(key),
             token);
     }
 
     private string ExtractObjectKey(string mediaUrl)
     {
-        var uri = new Uri(mediaUrl);
-        return uri.AbsolutePath.TrimStart('/');
+        if (string.IsNullOrEmpty(mediaUrl)) return string.Empty;
+
+        if (Uri.TryCreate(mediaUrl, UriKind.Absolute, out var uri))
+        {
+            var path = uri.AbsolutePath.TrimStart('/');
+            return path;
+        }
+
+        return mediaUrl.TrimStart('/');
     }
 
 }

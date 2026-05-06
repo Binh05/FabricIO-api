@@ -8,7 +8,7 @@ public class Game
     public string? Description { get; set; }
     public required string ThumbnailUrl { get; set; }
     public GameType GameType { get; set; }
-    public string? GameUrl { get; set; }
+    public required string GameUrl { get; set; }
     public decimal Price { get; set; } = 0;
     public bool IsDeleted { get; set; } = false;
     public DateTime? DeletedAt { get; set; }

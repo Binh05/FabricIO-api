@@ -6,9 +6,12 @@ using FabricIO_api.UnitOfWork;
 
 namespace FabricIO_api.Services;
 
-public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService storageService) : IGameServices
+public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService storageService, IConfiguration configuration) : IGameServices
 {
     private readonly string gameBucket = "game-assets";
+    private readonly string ThumbnailFolderName = "thumbnails";
+    private readonly string GameFolderName = "game-dist";
+    private readonly string _domain = configuration["AppSettings:Domain"] ?? "http://localhost:9000";
     public async Task<GameResponseDto> GetByIdAsync(Guid gameId, CancellationToken token)
     {
         var result = await unitOfWork.Games.GetByIdAsync<GameResponseDto>(gameId, token);
@@ -26,37 +29,35 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         var entity = mapper.Map<Game>(gameReq);
         entity.Id = Guid.NewGuid();
 
-        if (gameReq.Thumbnail == null)
+        string rootGamePath = entity.Id.ToString();
+        string thumbKey = $"{rootGamePath}/{ThumbnailFolderName}/{FormatThumbnail(gameReq.Thumbnail.FileName, entity.Id.ToString())}"; // relative path without bucketname
+
+        await unitOfWork.BeginTransactionAsync(token);
+        try
         {
-            throw new BadRequestException("Thiếu ảnh đại diện của game");
+            
+            entity.ThumbnailUrl = await storageService.UploadFileAsync(gameReq.Thumbnail, gameBucket, thumbKey, token);
+
+            entity.GameUrl = await storageService.ExtractAndUploadAsync(gameReq.GameFile, $"{rootGamePath}/{GameFolderName}-{entity.Id}", token); // return with full url
+            await storageService.UploadFileAsync(gameReq.GameFile, gameBucket, $"{rootGamePath}/source-{entity.Id}.zip", token);
+
+            if (gameReq.TagIds != null && gameReq.TagIds.Any())
+            {
+                await AddTagIds(entity, gameReq.TagIds, token);
+            }
+
+            entity.OwnerId = userId;
+            unitOfWork.Games.Insert(entity);
+
+            await unitOfWork.CommitAsync(token);
+        }
+        catch
+        {
+            await storageService.DeleteFolderAsync(gameBucket, rootGamePath, token);
+            await unitOfWork.RollBackAsync(token);
         }
 
-        var thumbKey = $"{entity.Id}/thumbnails/{entity.Id}.png"; // relative path without bucketname
-        entity.ThumbnailUrl = await storageService.UploadFileAsync(gameReq.Thumbnail, "game-assets", thumbKey, token);
-
-        //if (gameReq.GameType == GameType.Browser)
-        //{
-        if (gameReq.GameFile == null)
-            throw new BadRequestException("Browser game cần file zip");
-
-        var path = await storageService.ExtractAndUploadAsync(gameReq.GameFile, entity.Id, token); // return relavtive path with bucket name
-        await storageService.UploadFileAsync(gameReq.GameFile, gameBucket, $"{entity.Id}/source.zip", token);
-
-        entity.GameUrl = $"{path}/index.html"; // relative path
-
-
-        if (gameReq.TagIds != null && gameReq.TagIds.Any())
-        {
-            await AddTagIds(entity, gameReq.TagIds, token);
-        }
-
-        entity.OwnerId = userId;
-        unitOfWork.Games.Insert(entity);
-        await unitOfWork.SaveAsync(token);
-
-        var result = await unitOfWork.Games.FindOneAsync<GameResponseDto>(g => g.Id == entity.Id, token);
-        
-        return result!;
+        return await unitOfWork.Games.GetByIdAsync<GameResponseDto>(entity.Id, token);
     }
 
     public async Task<string> GetPlayUrlAsync(Guid userId, Guid gameId, CancellationToken token)
@@ -75,7 +76,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         unitOfWork.GamePlays.Insert(gamePlay);
         await unitOfWork.SaveAsync(token);
 
-        return game.GameUrl;
+        return $"{game.GameUrl}/index.html";
     }
 
     public async Task<GamePaginationResult> GetAllAsync(Guid? userId, GetPaginationGameDto param, CancellationToken token)
@@ -157,20 +158,33 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
 
         mapper.Map(req, game);
 
+        string? gameUploadPath = null;
+        string? oldGameUrl = null;
+
+        string? thumbnailUploadUrl = null;
+        string? oldThumbnailUploadUrl = null;
+
+        string newRootPath = game.Id.ToString();
+        string gameSessionId = Guid.NewGuid().ToString();
+
         await unitOfWork.BeginTransactionAsync(token);
         try
         {
             if (req.Thumbnail != null)
             {
-                game.ThumbnailUrl = await storageService.UploadFileAsync(req.Thumbnail, "file", $"avatars/{game.OwnerId}", token);
+                thumbnailUploadUrl = $"{newRootPath}/{ThumbnailFolderName}/{FormatThumbnail(req.Thumbnail.FileName, gameSessionId)}";
+                oldThumbnailUploadUrl = game.ThumbnailUrl;
+
+                game.ThumbnailUrl = await storageService.UploadFileAsync(req.Thumbnail, gameBucket, thumbnailUploadUrl, token);
             }
 
             if (req.GameFile != null)
             {
-                var path = await storageService.ExtractAndUploadAsync(req.GameFile, gameId, token);
-                await storageService.UploadFileAsync(req.GameFile, gameBucket, $"{gameId}/source.zip", token);
+                gameUploadPath = $"{newRootPath}/{GameFolderName}-{gameSessionId}";
+                oldGameUrl = game.GameUrl;
 
-                game.GameUrl = $"{path}/index.html";
+                game.GameUrl = await storageService.ExtractAndUploadAsync(req.GameFile, gameUploadPath, token);
+                await storageService.UploadFileAsync(req.GameFile, gameBucket, $"{newRootPath}/source-{gameSessionId}.zip", token);
             }
 
             if (req.TagIds != null)
@@ -181,9 +195,36 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
             }
 
             await unitOfWork.CommitAsync(token);
+
+            if (!string.IsNullOrEmpty(oldThumbnailUploadUrl))
+            {
+                await storageService.DeleteFileByUrlAsync(oldThumbnailUploadUrl, token);
+            }
+
+            if (!string.IsNullOrEmpty(oldGameUrl) && oldGameUrl != game.GameUrl)
+            {
+                await storageService.DeleteFolderAsync(gameBucket, oldGameUrl, token);
+                if (oldGameUrl.Contains($"/{GameFolderName}-"))
+                {
+                    string oldZipUrl = oldGameUrl.Replace($"/{GameFolderName}-", "/source-") + ".zip";
+                    await storageService.DeleteFileByUrlAsync(oldZipUrl, token);
+                }
+            }
         }
         catch
         {
+            if (!string.IsNullOrEmpty(thumbnailUploadUrl))
+            {
+                await storageService.DeleteFileByUrlAsync(thumbnailUploadUrl, token);
+            }
+
+            if (!string.IsNullOrEmpty(gameUploadPath))
+            {
+                await storageService.DeleteFolderAsync(gameBucket, gameUploadPath, token);
+                string newZipKey = $"{gameBucket}/{newRootPath}/source-{gameSessionId}.zip";
+                await storageService.DeleteFileByUrlAsync(newZipKey, token);
+            }
+            
             await unitOfWork.RollBackAsync(token);
             throw;
         }
@@ -203,5 +244,10 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
             TagId = t.Id,
             GameId = entity.Id
         }).ToList();
+    }
+
+    private string FormatThumbnail(string fileName, string? id = null)
+    {
+        return "thumbnail-" + (id ?? Guid.NewGuid().ToString()) + Path.GetExtension(fileName);
     }
 }
