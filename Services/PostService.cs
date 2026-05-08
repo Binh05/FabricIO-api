@@ -103,7 +103,7 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         post.Title = request.Title;
         post.Content = request.Content;
         post.UpdatedAt = DateTime.UtcNow;
-        
+
         if (request.DeletedImageIds != null && request.DeletedImageIds.Any())
         {
             foreach (var imageId in request.DeletedImageIds)
@@ -111,7 +111,8 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
                 var media = unitOfWork.PostMedias.GetEntityAsync(m => m.Id == imageId, token).Result;
                 if (media != null)
                 {
-                    await storageService.DeleteFileByUrlAsync(media.MediaUrl, token); 
+                    String objectKey = ExtractObjectKey(media.MediaUrl);
+                    await storageService.DeleteFileByUrlAsync("file", objectKey, token);
                     unitOfWork.PostMedias.Delete(media);
                 }
             }
@@ -134,6 +135,14 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
 
         var result = await unitOfWork.Posts.FindOneAsync<PostResponseDto>(p => p.Id == id, token);
         return result!;
+    }
+
+    private string ExtractObjectKey(string mediaUrl)
+    {
+        var uri = new Uri(mediaUrl);
+        return uri.AbsolutePath
+            .Replace("/file/", "")
+            .TrimStart('/');
     }
 
     public async Task DeletePostAsync(Guid userId, Guid id, CancellationToken token)
