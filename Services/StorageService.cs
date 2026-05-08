@@ -102,14 +102,8 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
     {
         await CheckBucketAsync(bucketName, token);
         
-        prefix = MediaUrl.ExtractObjectKey(prefix);
-        var parts = prefix.Split('/', 2);
-        if (parts.Length > 1 && parts[0] == bucketName) 
-        {
-            prefix = parts[1];
-        }
-
-        prefix = prefix.TrimEnd('/');
+        prefix = MediaUrl.ExtractObjectKey(prefix, bucketName);
+        if (!string.IsNullOrEmpty(prefix) && !prefix.EndsWith("/")) prefix += "/";
 
         var objects = minioClient.ListObjectsEnumAsync(
             new ListObjectsArgs()

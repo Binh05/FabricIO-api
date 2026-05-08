@@ -1,4 +1,4 @@
-﻿using Amazon.S3;
+using Amazon.S3;
 using Amazon.S3.Model;
 
 namespace FabricIO_api.Services
@@ -15,14 +15,46 @@ namespace FabricIO_api.Services
             }, token);
         }
 
-        public Task DeleteFolderAsync(string bucketName, string prefix, CancellationToken token)
+        public async Task DeleteFolderAsync(string bucketName, string prefix, CancellationToken token)
         {
-            throw new NotImplementedException();
+            prefix = MediaUrl.ExtractObjectKey(prefix, bucketName);
+            if (!prefix.EndsWith("/")) prefix += "/";
+
+            var listRequest = new ListObjectsV2Request
+            {
+                BucketName = bucketName,
+                Prefix = prefix
+            };
+
+            ListObjectsV2Response listResponse;
+            do
+            {
+                listResponse = await s3Client.ListObjectsV2Async(listRequest, token);
+
+                if (listResponse.S3Objects.Count > 0)
+                {
+                    var deleteRequest = new DeleteObjectsRequest
+                    {
+                        BucketName = bucketName,
+                        Objects = listResponse.S3Objects.Select(o => new KeyVersion { Key = o.Key }).ToList()
+                    };
+
+                    await s3Client.DeleteObjectsAsync(deleteRequest, token);
+                }
+
+                listRequest.ContinuationToken = listResponse.NextContinuationToken;
+
+            } while (listResponse.IsTruncated);
         }
 
-        public Task<string> DownloadFileAync(Guid fileId, CancellationToken token)
+        public async Task<string> DownloadFileAync(string bucketName, string key, CancellationToken token)
         {
-            throw new NotImplementedException();
+            return s3Client.GetPreSignedURL(new GetPreSignedUrlRequest
+            {
+                BucketName = bucketName,
+                Key = key,
+                Expires = DateTime.UtcNow.AddHours(1)
+            });
         }
 
         public Task<string> ExtractAndUploadAsync(IFormFile fileZip, string rootPath, CancellationToken token)
