@@ -1,6 +1,7 @@
 using AutoMapper;
 using FabricIO_api.DTOs;
 using FabricIO_api.Entities;
+using FabricIO_api.Extensions;
 using FabricIO_api.Middleware;
 using FabricIO_api.UnitOfWork;
 
@@ -8,10 +9,9 @@ namespace FabricIO_api.Services;
 
 public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService storageService, IConfiguration configuration) : IGameServices
 {
-    private readonly string gameBucket = "game-assets";
+    private readonly string gameBucket = configuration["Storage:GameBucketName"] ?? "game-assets";
     private readonly string ThumbnailFolderName = "thumbnails";
     private readonly string GameFolderName = "game-dist";
-    private readonly string _domain = configuration["AppSettings:Domain"] ?? "http://localhost:9000";
     public async Task<GameResponseDto> GetByIdAsync(Guid gameId, CancellationToken token)
     {
         var result = await unitOfWork.Games.GetByIdAsync<GameResponseDto>(gameId, token);
@@ -124,7 +124,13 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
 
     public async Task<GameDownloadDto> DownloadGameAsync(Guid gameId, CancellationToken token)
     {
-        var url = await storageService.DownloadFileAync(gameId, token);
+        var game = await unitOfWork.Games.GetEntityAsync(g => g.Id == gameId, token);
+        if (game == null)
+        {
+            throw new NotFoundException("Game không tồn tại");
+        }
+        var objectKey = MediaUrl.ExtractObjectKey(game.GameUrl, gameBucket).Replace($"{GameFolderName}-", "source-") + ".zip";
+        var url = await storageService.DownloadFileAync(gameBucket, objectKey, token);
 
         return new GameDownloadDto { DownloadUrl = url };
     }
@@ -198,7 +204,8 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
 
             if (!string.IsNullOrEmpty(oldThumbnailUploadUrl))
             {
-                await storageService.DeleteFileByUrlAsync(oldThumbnailUploadUrl, token);
+                var objectKey = MediaUrl.ExtractObjectKey(oldThumbnailUploadUrl, gameBucket);
+                await storageService.DeleteFileByUrlAsync(gameBucket, objectKey, token);
             }
 
             if (!string.IsNullOrEmpty(oldGameUrl) && oldGameUrl != game.GameUrl)
@@ -207,7 +214,8 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
                 if (oldGameUrl.Contains($"/{GameFolderName}-"))
                 {
                     string oldZipUrl = oldGameUrl.Replace($"/{GameFolderName}-", "/source-") + ".zip";
-                    await storageService.DeleteFileByUrlAsync(oldZipUrl, token);
+                    string objectKey = MediaUrl.ExtractObjectKey(oldZipUrl, gameBucket);
+                    await storageService.DeleteFileByUrlAsync(gameBucket, objectKey, token);
                 }
             }
         }
@@ -215,14 +223,15 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         {
             if (!string.IsNullOrEmpty(thumbnailUploadUrl))
             {
-                await storageService.DeleteFileByUrlAsync(thumbnailUploadUrl, token);
+                var objectKey = MediaUrl.ExtractObjectKey(thumbnailUploadUrl, gameBucket);
+                await storageService.DeleteFileByUrlAsync(gameBucket, objectKey, token);
             }
 
             if (!string.IsNullOrEmpty(gameUploadPath))
             {
                 await storageService.DeleteFolderAsync(gameBucket, gameUploadPath, token);
-                string newZipKey = $"{gameBucket}/{newRootPath}/source-{gameSessionId}.zip";
-                await storageService.DeleteFileByUrlAsync(newZipKey, token);
+                string newZipKey = $"{newRootPath}/source-{gameSessionId}.zip";
+                await storageService.DeleteFileByUrlAsync(gameBucket, newZipKey, token);
             }
             
             await unitOfWork.RollBackAsync(token);

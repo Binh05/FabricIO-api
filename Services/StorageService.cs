@@ -1,3 +1,4 @@
+using FabricIO_api.Extensions;
 using Minio;
 using Minio.DataModel.Args;
 using System.IO.Compression;
@@ -101,7 +102,7 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
     {
         await CheckBucketAsync(bucketName, token);
         
-        prefix = ExtractObjectKey(prefix);
+        prefix = MediaUrl.ExtractObjectKey(prefix);
         var parts = prefix.Split('/', 2);
         if (parts.Length > 1 && parts[0] == bucketName) 
         {
@@ -142,48 +143,25 @@ public class StorageServices(IMinioClient minioClient, IConfiguration configurat
         }
     }
 
-    public async Task<string> DownloadFileAync(Guid fileId, CancellationToken token)
+    public async Task<string> DownloadFileAync(string bucketName, string key, CancellationToken token)
     {
         await CheckBucketAsync(gameBucket, token);
 
         var url = await minioClient.PresignedGetObjectAsync( 
             new PresignedGetObjectArgs()
-            .WithBucket(gameBucket)
-            .WithObject($"{fileId}/source-{fileId}.zip")
+            .WithBucket(bucketName)
+            .WithObject(key)
             .WithExpiry(60 * 60));
 
         return url;
     }
 
-    public async Task DeleteFileByUrlAsync(string mediaUrl, CancellationToken token)
+    public async Task DeleteFileByUrlAsync(string bucketName, string key, CancellationToken token)
     {
-        var objectKey = ExtractObjectKey(mediaUrl);
-
-        Console.WriteLine($"Extracted object key: {objectKey}");
-        
-        var parts = objectKey.Split('/', 2);
-        if (parts.Length < 2) return;
-        var bucket = parts[0];
-        var key = parts[1];
-
         await minioClient.RemoveObjectAsync(
             new RemoveObjectArgs()
-                .WithBucket(bucket)
+                .WithBucket(bucketName)
                 .WithObject(key),
             token);
     }
-
-    private string ExtractObjectKey(string mediaUrl)
-    {
-        if (string.IsNullOrEmpty(mediaUrl)) return string.Empty;
-
-        if (Uri.TryCreate(mediaUrl, UriKind.Absolute, out var uri))
-        {
-            var path = uri.AbsolutePath.TrimStart('/');
-            return path;
-        }
-
-        return mediaUrl.TrimStart('/');
-    }
-
 }

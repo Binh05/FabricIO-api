@@ -6,7 +6,7 @@ public interface IStorageService
     Task<string> ExtractAndUploadAsync(IFormFile fileZip, string rootPath, CancellationToken token);
     string GetPublicUrl(string objectName);
     string GetContentType(string file);
-    Task<string> DownloadFileAync(Guid fileId, CancellationToken token);
+    Task<string> DownloadFileAync(string bucketName, string key, CancellationToken token);
     Task DeleteFolderAsync(string bucketName, string prefix, CancellationToken token);
-    Task DeleteFileByUrlAsync(string mediaUrl, CancellationToken token);
+    Task DeleteFileByUrlAsync(string bucketName, string key, CancellationToken token);
 }
