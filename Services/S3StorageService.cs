@@ -1,4 +1,4 @@
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
 using FabricIO_api.Extensions;
 using System.IO.Compression;
@@ -19,9 +19,9 @@ namespace FabricIO_api.Services
         }
 
         public async Task DeleteFolderAsync(
-    string bucketName,
-    string prefix,
-    CancellationToken token)
+            string bucketName,
+            string prefix,
+            CancellationToken token)
         {
             prefix = MediaUrl.ExtractObjectKey(prefix, bucketName);
 
@@ -35,7 +35,7 @@ namespace FabricIO_api.Services
             {
                 BucketName = bucketName,
                 Prefix = prefix,
-                MaxKeys = 1000 // gi?i h?n chu?n c?a S3 batch delete
+                MaxKeys = 1000 // giới hạn chuẩn của S3 batch delete
             };
 
             ListObjectsV2Response listResponse;
