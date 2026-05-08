@@ -8,6 +8,7 @@ namespace FabricIO_api.Services;
 
 public class UserService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService storageService) : IUserService
 {
+    private readonly string imageFiles = "fabricio-file";
     public async Task<IEnumerable<UserResponse>> GetAllAsync(UserRole role, CancellationToken token)
     {
         if (role != UserRole.Admin)
@@ -25,7 +26,7 @@ public class UserService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
             throw new NotFoundException("User không tồn tại");
         }
 
-        var avatarUrl = await storageService.UploadFileAsync(imgFile, "file", $"avatars/{userId}.png", token);
+        var avatarUrl = await storageService.UploadFileAsync(imgFile, imageFiles, $"avatars/{userId}.png", token);
         if (avatarUrl == null)
         {
             throw new BadRequestException("Upload avatar khong thanh cong");

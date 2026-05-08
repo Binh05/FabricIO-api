@@ -1,3 +1,5 @@
+using Amazon;
+using Amazon.S3;
 using FabricIO_api.DataAccess;
 using FabricIO_api.Entities;
 using FabricIO_api.Middleware;
@@ -57,26 +59,48 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-//MinIO Config
-var accessKey = builder.Configuration["Storage:AccessKey"];
-var secretKeyMinio = builder.Configuration["Storage:SecretKey"];
-var endpoint = builder.Configuration["Storage:EndPoint"];
-
-builder.Services.AddMinio(configureClient => configureClient
-    .WithEndpoint(endpoint)
-    .WithCredentials(accessKey, secretKeyMinio)
-    .WithSSL(false)
-    .Build());
 
 GameProfile._domain = builder.Configuration["AppSettings:Domain"] ?? "http://localhost";
 builder.Services.AddAutoMapper(config => {}, Assembly.GetExecutingAssembly());
+
+var storageProvider = builder.Configuration["Storage:Provider"];
+if (storageProvider == "MinIO")
+{
+    var accessKey = builder.Configuration["Storage:AccessKey"];
+    var secretKeyMinio = builder.Configuration["Storage:SecretKey"];
+    var endpoint = builder.Configuration["Storage:EndPoint"];
+
+    builder.Services.AddMinio(configureClient => configureClient
+        .WithEndpoint(endpoint)
+        .WithCredentials(accessKey, secretKeyMinio)
+        .WithSSL(false)
+        .Build());
+
+    builder.Services.AddScoped<IStorageService, StorageServices>();
+}
+else
+{
+    var accessKey = builder.Configuration["Storage:AccessKey"];
+    var secretKeyS3 = builder.Configuration["Storage:SecretKey"];
+    var region = builder.Configuration["Storage:Region"];
+
+    builder.Services.AddSingleton<IAmazonS3>(_ =>
+    {
+        return new AmazonS3Client(
+            accessKey,
+            secretKeyS3,
+            RegionEndpoint.GetBySystemName(region)
+        );
+    });
+
+    builder.Services.AddScoped<IStorageService, S3StorageService>();
+}
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGameServices, GameService>();
 builder.Services.AddScoped<IAuthServices, AuthServices>();
 builder.Services.AddScoped<ISessionServices, SessionService>();
-builder.Services.AddScoped<IStorageService, StorageServices>();
 builder.Services.AddScoped<IGameTagService, GameTagService>();
 builder.Services.AddScoped<IGameFavoriteService, GameFavoriteService>();
 builder.Services.AddScoped<IPostService, PostService>();
