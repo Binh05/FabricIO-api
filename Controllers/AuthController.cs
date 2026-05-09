@@ -30,8 +30,8 @@ public class AuthController(IAuthServices authServices, ISessionServices session
         Response.Cookies.Append("token", jwtToken, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,
-            SameSite = SameSiteMode.Lax,
+            Secure = true,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddDays(7)
         });
 
