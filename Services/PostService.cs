@@ -17,7 +17,7 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         {
             foreach (var file in request.MediaFiles)
             {
-                var mediaUrl = await storageService.UploadFileAsync(file, "file", "post/" + post.Id + "/" + file.FileName, token);
+                var mediaUrl = await storageService.UploadFileAsync(file, "fabricio-file", "post/" + post.Id + "/" + file.FileName, token);
                 post.Media.Add(new PostMedia
                 {
                     MediaUrl = mediaUrl
@@ -112,7 +112,7 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
                 if (media != null)
                 {
                     String objectKey = ExtractObjectKey(media.MediaUrl);
-                    await storageService.DeleteFileByUrlAsync("file", objectKey, token);
+                    await storageService.DeleteFileByUrlAsync("fabricio-file", objectKey, token);
                     unitOfWork.PostMedias.Delete(media);
                 }
             }
@@ -122,7 +122,7 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         {
             foreach (var file in request.NewImages)
             {
-                var mediaUrl = await storageService.UploadFileAsync(file, "file", "post/" + post.Id + "/" + file.FileName, token);
+                var mediaUrl = await storageService.UploadFileAsync(file, "fabricio-file", "post/" + post.Id + "/" + file.FileName, token);
                 post.Media.Add(new PostMedia
                 {
                     MediaUrl = mediaUrl
@@ -141,7 +141,7 @@ public class PostService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
     {
         var uri = new Uri(mediaUrl);
         return uri.AbsolutePath
-            .Replace("/file/", "")
+            .Replace("/fabricio-file/", "")
             .TrimStart('/');
     }
 
