@@ -149,7 +149,7 @@ builder.Services.AddCors(opt =>
 {
     opt.AddPolicy(corsName, policy =>
     {
-        policy.WithOrigins("https://fe-fabricio-final.onrender.com", "http://localhost:5173")
+        policy.WithOrigins("https://fabricio-54fb.onrender.com", "http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
