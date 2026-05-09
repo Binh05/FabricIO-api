@@ -125,6 +125,22 @@ namespace FabricIO_api.Services
                         ContentType = GetContentType(file)
                     };
 
+                    if (file.EndsWith(".js.br", StringComparison.OrdinalIgnoreCase))
+                    {
+                        putRequest.ContentType = "application/javascript";
+                        putRequest.Headers.ContentEncoding = "br";
+                    }
+                    else if (file.EndsWith(".wasm.br", StringComparison.OrdinalIgnoreCase))
+                    {
+                        putRequest.ContentType = "application/wasm";
+                        putRequest.Headers.ContentEncoding = "br";
+                    }
+                    else if (file.EndsWith(".data.br", StringComparison.OrdinalIgnoreCase))
+                    {
+                        putRequest.ContentType = "application/octet-stream";
+                        putRequest.Headers.ContentEncoding = "br";
+                    }
+
                     await s3Client.PutObjectAsync(putRequest, token);
                 }
             }
