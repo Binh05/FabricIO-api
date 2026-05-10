@@ -168,6 +168,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapGet("/", () => 
+{
+    Results.Redirect("https://fabricio-54fb.onrender.com");
+});
+
 app.UseCors(corsName);
 app.UseAuthentication();
 app.UseAuthorization();
