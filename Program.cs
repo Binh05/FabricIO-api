@@ -7,6 +7,7 @@ using FabricIO_api.ProfileMappers;
 using FabricIO_api.Services;
 using FabricIO_api.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -156,6 +157,8 @@ builder.Services.AddCors(opt =>
     });
 });
 
+string Fe_URL = builder.Configuration["AppSettings:FE_URL"] ?? "";
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -166,11 +169,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                       ForwardedHeaders.XForwardedProto
+});
+
 app.UseHttpsRedirection();
+
 
 app.MapGet("/", () => 
 {
-    Results.Redirect("https://fabricio-54fb.onrender.com");
+    return Results.Redirect(Fe_URL);
 });
 
 app.UseCors(corsName);
