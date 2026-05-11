@@ -49,7 +49,12 @@ public class AuthController(IAuthServices authServices, ISessionServices session
             await sessionServices.RevokeSessionAsync(sessionToken, cancellationToken);
         }
 
-        Response.Cookies.Delete("token");
+        Response.Cookies.Delete("token", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None
+        });
         
         return NoContent();
     }
