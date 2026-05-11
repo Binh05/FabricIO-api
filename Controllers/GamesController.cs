@@ -115,7 +115,8 @@ public class GamesController(IGameServices gameServices) : ControllerBase
     public async Task<ActionResult> DeleteGameAsync([FromRoute] Guid id, CancellationToken token)
     {
         var userId = User.GetUserId();
-        await gameServices.DeleteAsync(userId, id, token);
+        var role = User.GetRole();
+        await gameServices.DeleteAsync(userId, role, id, token);
 
         return NoContent();
     }

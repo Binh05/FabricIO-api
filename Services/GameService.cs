@@ -93,7 +93,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
         unitOfWork.Games.Insert(game);
         await unitOfWork.SaveAsync(token);
     }
-    public async Task DeleteAsync(Guid userId, Guid gameId, CancellationToken token)
+    public async Task DeleteAsync(Guid userId, UserRole role, Guid gameId, CancellationToken token)
     {
         var game = await unitOfWork.Games.GetEntityAsync(g => g.Id == gameId, token);
         if (game == null)
@@ -101,7 +101,7 @@ public class GameService(IUnitOfWork unitOfWork, IMapper mapper, IStorageService
             throw new NotFoundException("Game không tồn tại");
         }
 
-        if (game.OwnerId != userId)
+        if (game.OwnerId != userId && role != UserRole.Admin)
         {
             throw new UnauthorizedException("Bạn không có quyền xóa game này");
         }
