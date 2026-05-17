@@ -6,7 +6,7 @@ using FabricIO_api.UnitOfWork;
 
 namespace FabricIO_api.Services;
 
-public class SessionService(IUnitOfWork unitOfWork) : ISessionServices
+public class SessionService(IUnitOfWork unitOfWork) : ISessionService
 {
     public async Task<Session> InsertSessionAsync(string token, Guid userId, CancellationToken cancellationToken)
     {

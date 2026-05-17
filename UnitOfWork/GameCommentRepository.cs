@@ -7,8 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FabricIO_api.UnitOfWork;
 
-public class GameCommentRepository(IMapper mapper, AppDbContext dbContext) : Repository<GameComment>(mapper, dbContext), IGameCommentRepository
+public class GameCommentRepository : Repository<GameComment>, IGameCommentRepository
 {
+    public GameCommentRepository(IMapper mapper, AppDbContext dbContext) : base(mapper, dbContext) {}
     public async Task<GameCommentPaginationResult> GetPageCommentAsync(Guid gameId, PaginationDto req, CancellationToken token)
     {
         var query = dbContext.GameComments.AsQueryable();

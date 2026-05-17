@@ -100,8 +100,8 @@ else
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGameServices, GameService>();
-builder.Services.AddScoped<IAuthServices, AuthServices>();
-builder.Services.AddScoped<ISessionServices, SessionService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<IGameTagService, GameTagService>();
 builder.Services.AddScoped<IGameFavoriteService, GameFavoriteService>();
 builder.Services.AddScoped<IPostService, PostService>();

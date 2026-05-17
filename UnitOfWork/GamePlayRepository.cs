@@ -6,8 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FabricIO_api.UnitOfWork
 {
-    public class GamePlayRepository(IMapper mapper, AppDbContext dbContext) : Repository<GamePlay>(mapper, dbContext), IGamePlayRepository
+    public class GamePlayRepository : Repository<GamePlay>, IGamePlayRepository
     {
+        public GamePlayRepository(IMapper mapper, AppDbContext dbContext) : base(mapper, dbContext) {}
         public async Task<FeaturedGameResponse?> GetFeaturedGameAsync(CancellationToken token)
         {
             var topGamePlay = await dbContext.GamePlays

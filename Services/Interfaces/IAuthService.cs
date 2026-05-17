@@ -4,10 +4,10 @@ using Microsoft.Extensions.Options;
 
 namespace FabricIO_api.Services;
 
-public interface IAuthServices
+public interface IAuthService
 {
     string GenerateJwtToken(Guid userId, UserRole role);
     string GenerateRefreshToken();
     Task<UserResponse> RegisterAsync(UserRegister userInfo, CancellationToken token);
-    Task<(string AccessToken, string RefreshToken, Guid UserId)?> LoginAsync(UserLogin user, CancellationToken token);
+    Task<(string AccessToken, string RefreshToken, Guid UserId)> LoginAsync(UserLogin user, CancellationToken token);
 }

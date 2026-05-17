@@ -11,7 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace FabricIO_api.Services;
 
-public class AuthServices(IOptionsMonitor<AppSetting> optionsMonitor, IMapper mapper, IUnitOfWork unitOfWork) : IAuthServices
+public class AuthService(IOptionsMonitor<AppSetting> optionsMonitor, IMapper mapper, IUnitOfWork unitOfWork) : IAuthService
 {
     private readonly AppSetting appSetting = optionsMonitor.CurrentValue;
     public async Task<UserResponse> RegisterAsync(UserRegister userInfo, CancellationToken token)
@@ -32,7 +32,7 @@ public class AuthServices(IOptionsMonitor<AppSetting> optionsMonitor, IMapper ma
 
         return mapper.Map<UserResponse>(entity);
     }
-    public async Task<(string AccessToken, string RefreshToken, Guid UserId)?> LoginAsync(UserLogin user, CancellationToken token)
+    public async Task<(string AccessToken, string RefreshToken, Guid UserId)> LoginAsync(UserLogin user, CancellationToken token)
     {
         var userExisting = await unitOfWork.Users.FindOneAsync<UserBaseDto>(u => u.Username == user.Username, token);
         if (userExisting == null || 

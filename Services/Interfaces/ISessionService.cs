@@ -3,7 +3,7 @@ using FabricIO_api.Entities;
 
 namespace FabricIO_api.Services;
 
-public interface ISessionServices
+public interface ISessionService
 {
     Task RevokeSessionAsync(string token, CancellationToken cancellationToken);
     Task<Session> InsertSessionAsync(string token, Guid userId, CancellationToken cancellationToken);

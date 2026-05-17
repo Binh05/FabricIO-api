@@ -6,8 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FabricIO_api.UnitOfWork;
 
-public class GameRatingRepository(IMapper mapper, AppDbContext dbContext) : Repository<GameRating>(mapper, dbContext), IGameRatingRepository
+public class GameRatingRepository : Repository<GameRating>, IGameRatingRepository
 {
+    public GameRatingRepository(IMapper mapper, AppDbContext dbContext) : base(mapper, dbContext) {}
     public async Task<GameRatingResponse> GetRatingAsync(Guid gameId, CancellationToken token)
     {
         var result = await dbContext.Set<GameRating>()

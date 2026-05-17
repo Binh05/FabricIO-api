@@ -49,7 +49,7 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
     private readonly IGamePlayRepository gamePlays = new GamePlayRepository(mapper, ctx);
     public IGamePlayRepository GamePlays => gamePlays;
 
-    private IDbContextTransaction transaction;
+    private IDbContextTransaction? transaction;
     public async Task SaveAsync(CancellationToken token)
     {
         await ctx.SaveChangesAsync(token);
@@ -63,11 +63,13 @@ public class UnitOfWork(IMapper mapper, AppDbContext ctx) : IUnitOfWork
     public async Task CommitAsync(CancellationToken token)
     {
         await ctx.SaveChangesAsync(token);
-        await transaction.CommitAsync(token);
+        if (transaction != null)
+            await transaction.CommitAsync(token);
     }
 
     public async Task RollBackAsync(CancellationToken token)
     {
-        await transaction.RollbackAsync(token);
+        if (transaction != null) 
+            await transaction.RollbackAsync(token);
     }
 }

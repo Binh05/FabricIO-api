@@ -7,8 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FabricIO_api.UnitOfWork
 {
-    public class GameRepository(IMapper mapper, AppDbContext dbContext) : Repository<Game>(mapper, dbContext), IGameRepository
+    public class GameRepository : Repository<Game>, IGameRepository
     {
+        public GameRepository(IMapper mapper, AppDbContext dbContext) : base(mapper, dbContext) {}
         public async Task<GamePaginationResult> GetPaginationGameAsync(Guid? userId, GetPaginationGameDto req, CancellationToken token)
         {
             var query = dbContext.Games.AsQueryable();

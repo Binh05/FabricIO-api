@@ -7,7 +7,7 @@ namespace FabricIO_api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IAuthServices authServices, ISessionServices sessionServices) : ControllerBase
+public class AuthController(IAuthService authServices, ISessionService sessionServices) : ControllerBase
 {
     [HttpPost("register")]
     public async Task<ActionResult<UserResponse>> RegisterAsync(UserRegister user, CancellationToken token)
@@ -25,7 +25,7 @@ public class AuthController(IAuthServices authServices, ISessionServices session
     {
         var secureToken = await authServices.LoginAsync(user, cancellationToken);
 
-        var jwtToken = secureToken.Value.AccessToken;
+        var jwtToken = secureToken.AccessToken;
 
         Response.Cookies.Append("token", jwtToken, new CookieOptions
         {
@@ -35,7 +35,7 @@ public class AuthController(IAuthServices authServices, ISessionServices session
             Expires = DateTime.UtcNow.AddDays(7)
         });
 
-        await sessionServices.InsertSessionAsync(jwtToken, secureToken.Value.UserId, cancellationToken);
+        await sessionServices.InsertSessionAsync(jwtToken, secureToken.UserId, cancellationToken);
 
         return Ok(new { message = "Đăng nhập thành công" });
     }
