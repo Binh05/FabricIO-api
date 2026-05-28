@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\file_bai_tap\\Nam3_Ky2\\Project_CK\\FabricIO\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{6A08A68C-FF93-E192-6A62-AF46446899D6}|backend\\FabricIO-api.csproj|d:\\file_bai_tap\\nam3_ky2\\project_ck\\fabricio\\backend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{6A08A68C-FF93-E192-6A62-AF46446899D6}|backend\\FabricIO-api.csproj|solutionrelative:backend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\file_bai_tap\\Nam3_Ky2\\Project_CK\\FabricIO\\backend\\appsettings.json",
+              "RelativeDocumentMoniker": "backend\\appsettings.json",
+              "ToolTip": "D:\\file_bai_tap\\Nam3_Ky2\\Project_CK\\FabricIO\\backend\\appsettings.json",
+              "RelativeToolTip": "backend\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-05-21T16:46:22.323Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
