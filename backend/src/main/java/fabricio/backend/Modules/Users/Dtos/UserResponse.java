@@ -1,4 +1,4 @@
-package fabricio.backend.Modules.Users.Dtos;
+package fabricio.backend.modules.users.dtos;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

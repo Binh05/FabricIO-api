@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +27,6 @@ public abstract class BaseEntity {
     @Column(name = "createdAt", updatable = false)
     private LocalDateTime createdAt;
 
-    @CreationTimestamp
-    private LocalDateTime updatedAd;
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

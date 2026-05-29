@@ -1,4 +1,4 @@
-package fabricio.backend.Modules.Users.Entity;
+package fabricio.backend.modules.users.entities;
 
 import fabricio.backend.shared.base.BaseEntity;
 import jakarta.persistence.Column;

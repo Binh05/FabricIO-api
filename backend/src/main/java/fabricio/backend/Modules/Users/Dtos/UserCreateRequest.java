@@ -1,4 +1,4 @@
-package fabricio.backend.Modules.Users.Dtos;
+package fabricio.backend.modules.users.dtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

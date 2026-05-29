@@ -1,9 +1,12 @@
-package fabricio.backend.Modules.Users;
+package fabricio.backend.modules.users;
 
-import fabricio.backend.Modules.Users.Dtos.UserCreateRequest;
-import fabricio.backend.Modules.Users.Dtos.UserResponse;
+import java.util.List;
+import java.util.UUID;
+
+import fabricio.backend.modules.users.dtos.UserResponse;
+import fabricio.backend.modules.users.entities.User;
 
 public interface IUserService {
-    public String printHello(String name);
-    public UserResponse signup(UserCreateRequest req);
+    public UserResponse getUserById(UUID id);
+    public List<User> getAllUser();
 }
