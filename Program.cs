@@ -110,6 +110,7 @@ builder.Services.AddScoped<IPostCommentService, PostCommentService>();
 builder.Services.AddScoped<IGameCommentService, GameCommentService>();
 builder.Services.AddScoped<IGameRatingService, GameRatingService>();
 builder.Services.AddScoped<IGamePurchaseService, GamePurchaseService>();
+builder.Services.AddHttpClient<IGameRecommendationChatService, GameRecommendationChatService>();
 builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
 
 var secretKey = builder.Configuration["AppSettings:SecretKey"];
